@@ -9,6 +9,9 @@ public class Project {
     private String name;
     private String client_project_name;
 
+    public Project() {
+    }
+
     public Project(String jsonString) {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
@@ -39,15 +42,21 @@ public class Project {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
-        object.put("id", id);
-        object.put("name", name);
-        object.put("client_project_name", client_project_name);
+        if (id != null) {
+            object.put("id", id);
+        }
+        if (name != null) {
+            object.put("name", name);
+        }
+        if (client_project_name != null) {
+            object.put("client_project_name", client_project_name);
+        }
         return object;
     }
-    
+
     public String toJSONString() {
         return this.toJSONObject().toJSONString();
     }

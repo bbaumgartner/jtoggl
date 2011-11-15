@@ -1,4 +1,4 @@
-package ch.simas.jtoggl;
+package ch.simas.jtoggl.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,7 +14,7 @@ public class DateUtil {
         try {
             date = sdf.parse(dateString);
         } catch (ParseException ex) {
-            Logger.getLogger(TimeEntries.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DateUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return date;
     }

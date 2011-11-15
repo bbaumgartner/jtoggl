@@ -1,5 +1,6 @@
 package ch.simas.jtoggl;
 
+import ch.simas.jtoggl.util.DateUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,10 @@ public class TimeEntry {
     private Workspace workspace;
     private List<String> tag_names = new ArrayList<String>();
     private boolean ignore_start_and_stop;
+    private String created_with;
+
+    public TimeEntry() {
+    }
 
     public TimeEntry(String jsonString) {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
@@ -29,8 +34,13 @@ public class TimeEntry {
         this.duration = (Long) object.get("duration");
         this.billable = (Boolean) object.get("billable");
         this.ignore_start_and_stop = (Boolean) object.get("ignore_start_and_stop");
+        created_with = (String) object.get("created_with");
 
-        this.workspace = new Workspace(((JSONObject) object.get("workspace")).toJSONString());
+
+        JSONObject workspaceObject = (JSONObject) object.get("workspace");
+        if (workspaceObject != null) {
+            this.workspace = new Workspace(workspaceObject.toJSONString());
+        }
 
         JSONObject projectObject = (JSONObject) object.get("project");
         if (projectObject != null) {
@@ -125,33 +135,58 @@ public class TimeEntry {
         this.workspace = workspace;
     }
 
+    public String getCreated_with() {
+        return created_with;
+    }
+
+    public void setCreated_with(String created_with) {
+        this.created_with = created_with;
+    }
+
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
         object.put("billable", billable);
-        object.put("description", description);
-        object.put("duration", duration);
-        object.put("id", id);
+        if (description != null) {
+            object.put("description", description);
+        }
+        if (duration != 0) {
+            object.put("duration", duration);
+        }
+        if (id != null) {
+            object.put("id", id);
+        }
         object.put("ignore_start_and_stop", ignore_start_and_stop);
-        object.put("start", DateUtil.convertDateToString(start));
-        object.put("stop", DateUtil.convertDateToString(stop));
+        if (start != null) {
+            object.put("start", DateUtil.convertDateToString(start));
+        }
+        if (stop != null) {
+            object.put("stop", DateUtil.convertDateToString(stop));
+        }
+        if (created_with != null) {
+            object.put("created_with", created_with);
+        }
 
-        JSONArray tag_names_arr = new JSONArray();
-        tag_names_arr.addAll(this.tag_names);
-        object.put("tag_names", tag_names_arr);
+        if (!this.tag_names.isEmpty()) {
+            JSONArray tag_names_arr = new JSONArray();
+            tag_names_arr.addAll(this.tag_names);
+            object.put("tag_names", tag_names_arr);
+        }
 
         if (project != null) {
             object.put("project", this.project.toJSONObject());
         }
-        
-        object.put("workspace", this.workspace.toJSONObject());
-        
+
+        if (workspace != null) {
+            object.put("workspace", this.workspace.toJSONObject());
+        }
+
         return object;
     }
 
     public String toJSONString() {
         return this.toJSONObject().toJSONString();
     }
-    
+
     @Override
     public String toString() {
         return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" + start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" + workspace + ", tag_names=" + tag_names + ", ignore_start_and_stop=" + ignore_start_and_stop + '}';
