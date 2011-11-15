@@ -21,6 +21,11 @@ public class JToggl {
     private final static String TIME_ENTRY = "https://www.toggl.com/api/v6/time_entries/{0}.json";
     private final static String WORKSPACES = "https://www.toggl.com/api/v6/workspaces.json";
     private final static String CLIENTS = "https://www.toggl.com/api/v6/clients.json";
+    private final static String CLIENT = "https://www.toggl.com/api/v6/clients/{0}.json";
+    private final static String PROJECTS = "https://www.toggl.com/api/v6/projects.json";
+    private final static String PROJECT = "https://www.toggl.com/api/v6/projects/{0}.json";
+    private final static String TASKS = "https://www.toggl.com/api/v6/tasks.json";
+    private final static String TAGS = "https://www.toggl.com/api/v6/tags.json";
     private String user;
     private String password;
 
@@ -87,16 +92,17 @@ public class JToggl {
         WebResource webResource = client.resource(url);
 
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.put(String.class, object.toJSONString());
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get("data");
         return new TimeEntry(data.toJSONString());
     }
 
-    public void destroyTimeEntry(TimeEntry timeEntry) {
+    public void destroyTimeEntry(Long id) {
         Client client = prepareClient();
-        String url = TIME_ENTRY.replace("{0}", timeEntry.getId().toString());
+        String url = TIME_ENTRY.replace("{0}", id.toString());
         WebResource webResource = client.resource(url);
 
         webResource.delete(String.class);
@@ -134,20 +140,116 @@ public class JToggl {
         return clients;
     }
 
-// SingleClient createClient
-// SingleClient updateClient
-// SingleClient destroyClient
-// Projects getProjects
-// SingleProject createProject
-// SingleProject updateProject
-// SingleProjectUser createProjectUser
-// Tasks getTasks
-// SingleTask createTask
-// SingleTask updateTask
-// SingleTask destroyTask
-// Tags getTags
-// User getCurrentUser
-// User getCurrentUserWithRelatedData
+    public ch.simas.jtoggl.Client createClient(ch.simas.jtoggl.Client clientObject) {
+        Client client = prepareClient();
+        WebResource webResource = client.resource(CLIENTS);
+
+        JSONObject object = createClientRequestParameter(clientObject);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get("data");
+        return new ch.simas.jtoggl.Client(data.toJSONString());
+    }
+
+    public ch.simas.jtoggl.Client updateClient(ch.simas.jtoggl.Client clientObject) {
+        Client client = prepareClient();
+        String url = CLIENT.replace("{0}", clientObject.getId().toString());
+        WebResource webResource = client.resource(url);
+
+        JSONObject object = createClientRequestParameter(clientObject);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get("data");
+        return new ch.simas.jtoggl.Client(data.toJSONString());
+    }
+
+    public void destroyClient(Long id) {
+        Client client = prepareClient();
+        String url = CLIENT.replace("{0}", id.toString());
+        WebResource webResource = client.resource(url);
+
+        webResource.delete(String.class);
+    }
+
+    public List<Project> getProjects() {
+        Client client = prepareClient();
+        WebResource webResource = client.resource(PROJECTS);
+
+        String response = webResource.get(String.class);
+        JSONObject object = (JSONObject) JSONValue.parse(response);
+        JSONArray data = (JSONArray) object.get("data");
+
+        List<Project> projects = new ArrayList<Project>();
+        for (Object obj : data) {
+            JSONObject entryObject = (JSONObject) obj;
+            projects.add(new Project(entryObject.toJSONString()));
+        }
+        return projects;
+    }
+
+    public Project createProject(Project project) {
+        Client client = prepareClient();
+        WebResource webResource = client.resource(PROJECTS);
+
+        JSONObject object = createProjectRequestParameter(project);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get("data");
+        return new Project(data.toJSONString());
+    }
+
+    public Project updateProject(Project project) {
+        Client client = prepareClient();
+        String url = PROJECT.replace("{0}", project.getId().toString());
+        WebResource webResource = client.resource(url);
+
+        JSONObject object = createProjectRequestParameter(project);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get("data");
+        return new Project(data.toJSONString());
+    }
+
+    public ProjectUser createProjectUser(ProjectUser projectUser) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<Task> getTasks() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Task createTask(Task task) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Task udpateTask(Task task) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Task destroyTask(Task task) {
+        throw new UnsupportedOperationException();
+    }
+
+    public List<Tag> getTags() {
+        throw new UnsupportedOperationException();
+    }
+
+    public User getCurrentUser() {
+        throw new UnsupportedOperationException();
+    }
+
+    public User getCurrentUserWithRelatedData() {
+        throw new UnsupportedOperationException();
+    }
+
     private Client prepareClient() {
         Client client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(user, password));
@@ -158,6 +260,18 @@ public class JToggl {
     private JSONObject createTimeEntryRequestParameter(TimeEntry timeEntry) {
         JSONObject object = new JSONObject();
         object.put("time_entry", timeEntry.toJSONObject());
+        return object;
+    }
+
+    private JSONObject createClientRequestParameter(ch.simas.jtoggl.Client client) {
+        JSONObject object = new JSONObject();
+        object.put("client", client.toJSONObject());
+        return object;
+    }
+
+    private JSONObject createProjectRequestParameter(Project project) {
+        JSONObject object = new JSONObject();
+        object.put("project", project.toJSONObject());
         return object;
     }
 }
