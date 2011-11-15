@@ -6,7 +6,11 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class DateUtil {
+
+    private DateUtil() {
+    }
 
     public static Date convertStringToDate(String dateString) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
