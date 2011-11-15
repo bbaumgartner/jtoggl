@@ -8,6 +8,9 @@ public class Workspace {
     private Long id;
     private String name;
 
+    public Workspace() {
+    }
+
     public Workspace(String jsonString) {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
@@ -32,11 +35,15 @@ public class Workspace {
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
-        object.put("id", id);
-        object.put("name", name);
+        if (id != null) {
+            object.put("id", id);
+        }
+        if (name != null) {
+            object.put("name", name);
+        }
         return object;
     }
-    
+
     public String toJSONString() {
         return this.toJSONObject().toJSONString();
     }
