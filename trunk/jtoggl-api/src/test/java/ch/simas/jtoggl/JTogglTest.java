@@ -1,6 +1,8 @@
 package ch.simas.jtoggl;
 
 import java.util.Calendar;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,4 +35,5 @@ public class JTogglTest {
 
         Assert.assertTrue(entries.getEntries().isEmpty()); 
     }
+    
 }
