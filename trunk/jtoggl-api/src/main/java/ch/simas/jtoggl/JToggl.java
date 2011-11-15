@@ -3,6 +3,8 @@ package ch.simas.jtoggl;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MultivaluedMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -26,9 +29,21 @@ public class JToggl {
     }
 
     public TimeEntries getTimeEntries() {
+        return this.getTimeEntries(null, null);
+    }
+
+    public TimeEntries getTimeEntries(Date startDate, Date endDate) {
         Client client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(user, password));
+        client.addFilter(new LoggingFilter());
+        
         WebResource webResource = client.resource(GET_TIME_ENTRIES);
+        if (startDate != null && endDate != null) {
+            MultivaluedMap queryParams = new MultivaluedMapImpl();
+            queryParams.add("start_date", this.convertDateToString(startDate));
+            queryParams.add("end_date", this.convertDateToString(endDate));
+            webResource = webResource.queryParams(queryParams);
+        }
         String response = webResource.get(String.class);
 
         TimeEntries entries = new TimeEntries();
@@ -88,5 +103,10 @@ public class JToggl {
             Logger.getLogger(TimeEntries.class.getName()).log(Level.SEVERE, null, ex);
         }
         return date;
+    }
+
+    private String convertDateToString(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        return sdf.format(date);
     }
 }
