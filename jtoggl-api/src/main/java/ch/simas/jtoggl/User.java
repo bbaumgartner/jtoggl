@@ -25,7 +25,6 @@ import org.json.simple.JSONValue;
  * 
  * @author Simon Martinelli
  */
-
 public class User {
 
     private Long id;
@@ -213,5 +212,32 @@ public class User {
 
     public String toJSONString() {
         return this.toJSONObject().toJSONString();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" + api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" + jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" + default_workspace_id + ", new_time_entries_start_automatically=" + new_time_entries_start_automatically + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" + beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final User other = (User) obj;
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
     }
 }

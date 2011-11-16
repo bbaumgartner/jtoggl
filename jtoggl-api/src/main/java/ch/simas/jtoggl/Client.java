@@ -119,4 +119,26 @@ public class Client {
     public String toString() {
         return "Client{" + "id=" + id + ", name=" + name + ", hourly_rate=" + hourly_rate + ", currency=" + currency + ", workspace=" + workspace + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Client other = (Client) obj;
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }
