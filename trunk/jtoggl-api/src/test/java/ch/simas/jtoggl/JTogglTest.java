@@ -1,51 +1,55 @@
 package ch.simas.jtoggl;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JTogglTest {
 
     private static JToggl jToggl;
-    private TimeEntry timeEntry;
-    private Client client;
-    private Project project;
+    private static TimeEntry timeEntry;
+    private static Client client;
+    private static Project project;
+    private static Task task;
 
     @BeforeClass
-    public static void beforeClass() {
+    public static void beforeClass() throws Exception {
         String togglApiToken = System.getenv("TOGGL_API_TOKEN");
         if (togglApiToken == null) {
             throw new RuntimeException("TOGGL_API_TOKEN not set.");
         }
         jToggl = new JToggl(togglApiToken, "api_token");
+
+        client = createClient();
+        timeEntry = createTimeEntry();
+        project = createProject();
+        task = createTask();
     }
 
-    @Before
-    public void before() throws Exception {
-        this.client = this.createClient();
-        this.timeEntry = this.createTimeEntry();
-        this.project = this.createProject();
-    }
-
-    @After
-    public void after() throws Exception {
-        jToggl.destroyTimeEntry(this.timeEntry.getId());
-        jToggl.destroyClient(this.client.getId());
+    @AfterClass
+    public static void afterClass() throws Exception {
+        jToggl.destroyTimeEntry(timeEntry.getId());
+        jToggl.destroyClient(client.getId());
+        try {
+            jToggl.destroyTask(task.getId());
+        } catch (Exception e) {
+            // Ignore because Task is only for paying customers
+        }
     }
 
     @Test
-    public void getTimeEntries() throws Exception {
+    public void getTimeEntries() {
         List<TimeEntry> entries = jToggl.getTimeEntries();
 
         Assert.assertFalse(entries.isEmpty());
     }
 
     @Test
-    public void getTimeEntriesWithRange() throws Exception {
+    public void getTimeEntriesWithRange() {
         Calendar cal = Calendar.getInstance();
         cal.set(2011, 11, 10);
         List<TimeEntry> entries = jToggl.getTimeEntries(cal.getTime(), cal.getTime());
@@ -54,8 +58,8 @@ public class JTogglTest {
     }
 
     @Test
-    public void getTimeEntry() throws Exception {
-        TimeEntry te = jToggl.getTimeEntry(this.timeEntry.getId());
+    public void getTimeEntry() {
+        TimeEntry te = jToggl.getTimeEntry(timeEntry.getId());
 
         Assert.assertNotNull(te);
     }
@@ -65,21 +69,21 @@ public class JTogglTest {
         final String DESCRIPTION = "ABC";
 
         timeEntry.setDescription(DESCRIPTION);
-        TimeEntry te = jToggl.updateTimeEntry(this.timeEntry);
+        TimeEntry te = jToggl.updateTimeEntry(timeEntry);
 
         Assert.assertNotNull(te);
         Assert.assertEquals(DESCRIPTION, te.getDescription());
     }
 
     @Test
-    public void getWorkspaces() throws Exception {
+    public void getWorkspaces() {
         List<Workspace> workspaces = jToggl.getWorkspaces();
 
         Assert.assertFalse(workspaces.isEmpty());
     }
 
     @Test
-    public void getClients() throws Exception {
+    public void getClients() {
         List<Client> clients = jToggl.getClients();
 
         Assert.assertFalse(clients.isEmpty());
@@ -89,8 +93,8 @@ public class JTogglTest {
     public void updateClient() {
         final String NAME = "ABC";
 
-        this.client.setName(NAME);
-        Client cl = jToggl.updateClient(this.client);
+        client.setName(NAME);
+        Client cl = jToggl.updateClient(client);
 
         Assert.assertNotNull(cl);
         Assert.assertEquals(NAME, cl.getName());
@@ -105,14 +109,53 @@ public class JTogglTest {
 
     @Test
     public void updateProject() {
-        this.project.setBillable(true);
-        Project pr = jToggl.updateProject(this.project);
+        project.setBillable(true);
+        Project pr = jToggl.updateProject(project);
 
         Assert.assertNotNull(pr);
         Assert.assertTrue(pr.isBillable());
     }
 
-    private TimeEntry createTimeEntry() throws Exception {
+    @Test
+    public void createProjectUser() {
+        // TODO
+    }
+
+    @Test
+    public void getTasks() {
+        List<Task> tasks = jToggl.getTasks();
+
+        // TODO Task is only available in payed version
+        //Assert.assertFalse(tasks.isEmpty());
+    }
+
+    @Test
+    public void updateTask() {
+        task.setIs_active(false);
+        try {
+            Task t = jToggl.updateTask(task);
+            Assert.assertNotNull(t);
+            Assert.assertFalse(t.isIs_active());
+        } catch (Exception e) {
+            // Ignore because Task is only for paying customers
+        }
+    }
+
+    @Test
+    public void getTags() {
+        List<Tag> tags = jToggl.getTags();
+
+        Assert.assertFalse(tags.isEmpty());
+    }
+
+    @Test
+    public void getCurrentUser() {
+        User user = jToggl.getCurrentUser();
+
+        Assert.assertNotNull(user);
+    }
+
+    private static TimeEntry createTimeEntry() throws Exception {
         TimeEntry entry = new TimeEntry();
         entry.setDuration(480);
         entry.setBillable(true);
@@ -130,7 +173,7 @@ public class JTogglTest {
         return entry;
     }
 
-    private Client createClient() {
+    private static Client createClient() {
         Client cl = new Client();
         cl.setName("JUnit Client");
 
@@ -140,12 +183,12 @@ public class JTogglTest {
         return cl;
     }
 
-    private Project createProject() {
+    private static Project createProject() {
         List<Project> projects = jToggl.getProjects();
         if (projects.isEmpty()) {
             Project pr = new Project();
             pr.setName("JUnit Project");
-            pr.setClient(this.client);
+            pr.setClient(client);
 
             List<Workspace> ws = jToggl.getWorkspaces();
             pr.setWorkspace(ws.get(0));
@@ -157,5 +200,17 @@ public class JTogglTest {
         } else {
             return projects.get(0);
         }
+    }
+
+    private static Task createTask() {
+        Task t = new Task();
+        t.setName("JUnit Task " + new Date());
+        t.setIs_active(true);
+        t.setProject(project);
+
+        t = jToggl.createTask(t);
+        Assert.assertNotNull(t);
+
+        return t;
     }
 }

@@ -16,10 +16,10 @@ public class TimeEntry {
     private Date start;
     private Date stop;
     private long duration;
-    private boolean billable;
+    private Boolean billable;
     private Workspace workspace;
     private List<String> tag_names = new ArrayList<String>();
-    private boolean ignore_start_and_stop;
+    private Boolean ignore_start_and_stop;
     private String created_with;
 
     public TimeEntry() {
@@ -55,11 +55,11 @@ public class TimeEntry {
         this.tag_names = tags;
     }
 
-    public boolean isBillable() {
+    public Boolean isBillable() {
         return billable;
     }
 
-    public void setBillable(boolean billable) {
+    public void setBillable(Boolean billable) {
         this.billable = billable;
     }
 
@@ -87,11 +87,11 @@ public class TimeEntry {
         this.id = id;
     }
 
-    public boolean isIgnore_start_and_stop() {
+    public Boolean isIgnore_start_and_stop() {
         return ignore_start_and_stop;
     }
 
-    public void setIgnore_start_and_stop(boolean ignore_start_and_stop) {
+    public void setIgnore_start_and_stop(Boolean ignore_start_and_stop) {
         this.ignore_start_and_stop = ignore_start_and_stop;
     }
 
@@ -145,7 +145,9 @@ public class TimeEntry {
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
-        object.put("billable", billable);
+        if (billable != null) {
+            object.put("billable", billable);
+        }
         if (description != null) {
             object.put("description", description);
         }
@@ -155,7 +157,9 @@ public class TimeEntry {
         if (id != null) {
             object.put("id", id);
         }
-        object.put("ignore_start_and_stop", ignore_start_and_stop);
+        if (ignore_start_and_stop != null) {
+            object.put("ignore_start_and_stop", ignore_start_and_stop);
+        }
         if (start != null) {
             object.put("start", DateUtil.convertDateToString(start));
         }

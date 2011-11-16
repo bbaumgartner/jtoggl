@@ -27,7 +27,10 @@ public class JToggl {
     private final static String PROJECTS = "https://www.toggl.com/api/v6/projects.json";
     private final static String PROJECT = "https://www.toggl.com/api/v6/projects/{0}.json";
     private final static String TASKS = "https://www.toggl.com/api/v6/tasks.json";
+    private final static String TASK = "https://www.toggl.com/api/v6/tasks/{0}.json";
     private final static String TAGS = "https://www.toggl.com/api/v6/tags.json";
+    private final static String PROJECT_USERS = "https://www.toggl.com/api/v6/workspaces/31366/project_users.json";
+    private final static String GET_CURRENT_USER = "https://www.toggl.com/api/v6/me.json";
     private String user;
     private String password;
 
@@ -221,31 +224,95 @@ public class JToggl {
     }
 
     public ProjectUser createProjectUser(ProjectUser projectUser) {
-        throw new UnsupportedOperationException();
+        Client client = prepareClient();
+        WebResource webResource = client.resource(PROJECT_USERS);
+
+        JSONObject object = createProjectUserRequestParameter(projectUser);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+        return new ProjectUser(data.toJSONString());
     }
 
     public List<Task> getTasks() {
-        throw new UnsupportedOperationException();
+        Client client = prepareClient();
+        WebResource webResource = client.resource(TASKS);
+
+        String response = webResource.get(String.class);
+        JSONObject object = (JSONObject) JSONValue.parse(response);
+        JSONArray data = (JSONArray) object.get(DATA);
+
+        List<Task> tasks = new ArrayList<Task>();
+        for (Object obj : data) {
+            JSONObject entryObject = (JSONObject) obj;
+            tasks.add(new Task(entryObject.toJSONString()));
+        }
+        return tasks;
     }
 
     public Task createTask(Task task) {
-        throw new UnsupportedOperationException();
+        Client client = prepareClient();
+        WebResource webResource = client.resource(TASKS);
+
+        JSONObject object = createTaskRequestParameter(task);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+        return new Task(data.toJSONString());
     }
 
-    public Task udpateTask(Task task) {
-        throw new UnsupportedOperationException();
+    public Task updateTask(Task task) {
+        Client client = prepareClient();
+        String url = TASK.replace(PLACEHOLDER, task.getId().toString());
+        WebResource webResource = client.resource(url);
+
+        JSONObject object = createTaskRequestParameter(task);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+        return new Task(data.toJSONString());
     }
 
-    public Task destroyTask(Task task) {
-        throw new UnsupportedOperationException();
+    public void destroyTask(Long id) {
+        Client client = prepareClient();
+        String url = TASK.replace(PLACEHOLDER, id.toString());
+        WebResource webResource = client.resource(url);
+
+        webResource.delete(String.class);
     }
 
     public List<Tag> getTags() {
-        throw new UnsupportedOperationException();
+        Client client = prepareClient();
+        WebResource webResource = client.resource(TAGS);
+
+        String response = webResource.get(String.class);
+        JSONObject object = (JSONObject) JSONValue.parse(response);
+        JSONArray data = (JSONArray) object.get(DATA);
+
+        List<Tag> tags = new ArrayList<Tag>();
+        for (Object obj : data) {
+            JSONObject entryObject = (JSONObject) obj;
+            tags.add(new Tag(entryObject.toJSONString()));
+        }
+        return tags;
+
     }
 
     public User getCurrentUser() {
-        throw new UnsupportedOperationException();
+        Client client = prepareClient();
+        WebResource webResource = client.resource(GET_CURRENT_USER);
+
+        String response = webResource.get(String.class);
+        JSONObject object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+
+        return new User(data.toJSONString());
     }
 
     public User getCurrentUserWithRelatedData() {
@@ -276,4 +343,17 @@ public class JToggl {
         object.put("project", project.toJSONObject());
         return object;
     }
+
+    private JSONObject createProjectUserRequestParameter(ProjectUser projectUser) {
+        JSONObject object = new JSONObject();
+        object.put("project_user", projectUser.toJSONObject());
+        return object;
+    }
+
+    private JSONObject createTaskRequestParameter(Task task) {
+        JSONObject object = new JSONObject();
+        object.put("task", task.toJSONObject());
+        return object;
+    }
+
 }
