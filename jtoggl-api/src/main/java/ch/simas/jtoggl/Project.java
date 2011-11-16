@@ -8,9 +8,9 @@ public class Project {
     private Long id;
     private String name;
     private String client_project_name;
-    private boolean billable;
+    private Boolean billable;
     private Long estimated_workhours;
-    private boolean automatically_calculate_estimated_workhours;
+    private Boolean automatically_calculate_estimated_workhours;
     private Client client;
     private Workspace workspace;
 
@@ -78,12 +78,28 @@ public class Project {
         this.workspace = workspace;
     }
 
-    public boolean isBillable() {
+    public Boolean isBillable() {
         return billable;
     }
 
-    public void setBillable(boolean billable) {
+    public void setBillable(Boolean billable) {
         this.billable = billable;
+    }
+
+    public Boolean getAutomatically_calculate_estimated_workhours() {
+        return automatically_calculate_estimated_workhours;
+    }
+
+    public void setAutomatically_calculate_estimated_workhours(Boolean automatically_calculate_estimated_workhours) {
+        this.automatically_calculate_estimated_workhours = automatically_calculate_estimated_workhours;
+    }
+
+    public Long getEstimated_workhours() {
+        return estimated_workhours;
+    }
+
+    public void setEstimated_workhours(Long estimated_workhours) {
+        this.estimated_workhours = estimated_workhours;
     }
 
     public JSONObject toJSONObject() {
@@ -97,14 +113,19 @@ public class Project {
         if (client_project_name != null) {
             object.put("client_project_name", client_project_name);
         }
-        object.put("billable", billable);
+        if (billable != null) {
+            object.put("billable", billable);
+        }
         if (estimated_workhours != null) {
             object.put("estimated_workhours", estimated_workhours);
         }
-        object.put("automatically_calculate_estimated_workhours", automatically_calculate_estimated_workhours);
+        if (automatically_calculate_estimated_workhours != null) {
+            object.put("automatically_calculate_estimated_workhours", automatically_calculate_estimated_workhours);
+        }
         if (client != null) {
             object.put("client", this.client.toJSONObject());
         }
+
         if (workspace != null) {
             object.put("workspace", this.workspace.toJSONObject());
         }
@@ -117,6 +138,6 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", name=" + name + ", client_project_name=" + client_project_name + '}';
+        return "Project{" + "id=" + id + ", name=" + name + ", client_project_name=" + client_project_name + ", billable=" + billable + ", estimated_workhours=" + estimated_workhours + ", automatically_calculate_estimated_workhours=" + automatically_calculate_estimated_workhours + ", client=" + client + ", workspace=" + workspace + '}';
     }
 }
