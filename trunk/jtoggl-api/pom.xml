@@ -42,6 +42,10 @@
         </dependency>
     </dependencies>
     
+    <scm>
+        <developerConnection>scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api</developerConnection>
+    </scm>
+
     <distributionManagement>
         <repository>
             <id>simas3.ch</id>
