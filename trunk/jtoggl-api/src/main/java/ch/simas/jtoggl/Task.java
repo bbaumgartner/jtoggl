@@ -164,4 +164,26 @@ public class Task {
     public String toString() {
         return "Task{" + "id=" + id + ", name=" + name + ", estimated_workhours=" + estimated_workhours + ", estimated_seconds=" + estimated_seconds + ", is_active=" + is_active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Task other = (Task) obj;
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }

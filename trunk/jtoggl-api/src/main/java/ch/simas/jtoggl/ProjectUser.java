@@ -121,4 +121,26 @@ public class ProjectUser {
     public String toString() {
         return "ProjectUser{" + "id=" + id + ", hourly_rate=" + hourly_rate + ", manager=" + manager + ", project=" + project + ", user=" + user + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ProjectUser other = (ProjectUser) obj;
+        if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + (this.id != null ? this.id.hashCode() : 0);
+        return hash;
+    }
 }
