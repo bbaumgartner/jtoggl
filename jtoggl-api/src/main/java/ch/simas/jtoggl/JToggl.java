@@ -57,6 +57,7 @@ public class JToggl {
     private final static String GET_CURRENT_USER = "https://www.toggl.com/api/v6/me.json";
     private String user;
     private String password;
+    private boolean log = false;
 
     /**
      * Constructor to create an instance of JToggl.
@@ -482,10 +483,26 @@ public class JToggl {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Switch logging on.
+     */
+    public void switchLoggingOn() {
+        this.log = true;
+    }
+
+    /**
+     * Switch logging off.
+     */
+    public void switchLoggingOff() {
+        this.log = false;
+    }
+
     private Client prepareClient() {
         Client client = Client.create();
         client.addFilter(new HTTPBasicAuthFilter(user, password));
-        client.addFilter(new LoggingFilter());
+        if (log) {
+            client.addFilter(new LoggingFilter());
+        }
         return client;
     }
 
