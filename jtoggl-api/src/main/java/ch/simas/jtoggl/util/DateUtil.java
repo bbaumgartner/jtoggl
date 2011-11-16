@@ -30,11 +30,13 @@ import java.util.logging.Logger;
  */
 public class DateUtil {
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
     private DateUtil() {
     }
 
     public static Date convertStringToDate(String dateString) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         Date date = null;
         try {
             date = sdf.parse(dateString);
@@ -45,7 +47,7 @@ public class DateUtil {
     }
 
     public static String convertDateToString(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         return sdf.format(date);
     }
 }
