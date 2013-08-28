@@ -45,12 +45,4 @@
         <developerConnection>scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api</developerConnection>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>simas3.ch</id>
-            <name>simas Maven2 Repo</name>
-            <url>http://simas3.ch:8081/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
-
 </project>
