@@ -18,21 +18,28 @@
  */
 package ch.simas.jtoggl;
 
-import ch.simas.jtoggl.util.DateUtil;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import ch.simas.jtoggl.util.DateUtil;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * API Class for Toggl REST API.
@@ -43,20 +50,25 @@ public class JToggl {
 
     public static final String DATA = "data";
     public static final String PLACEHOLDER = "{0}";
-    private final static String TIME_ENTRIES = "https://www.toggl.com/api/v6/time_entries.json";
-    private final static String TIME_ENTRY = "https://www.toggl.com/api/v6/time_entries/{0}.json";
-    private final static String WORKSPACES = "https://www.toggl.com/api/v6/workspaces.json";
-    private final static String CLIENTS = "https://www.toggl.com/api/v6/clients.json";
-    private final static String CLIENT = "https://www.toggl.com/api/v6/clients/{0}.json";
-    private final static String PROJECTS = "https://www.toggl.com/api/v6/projects.json";
-    private final static String PROJECT = "https://www.toggl.com/api/v6/projects/{0}.json";
-    private final static String TASKS = "https://www.toggl.com/api/v6/tasks.json";
-    private final static String TASK = "https://www.toggl.com/api/v6/tasks/{0}.json";
-    private final static String TAGS = "https://www.toggl.com/api/v6/tags.json";
-    private final static String PROJECT_USERS = "https://www.toggl.com/api/v6/workspaces/31366/project_users.json";
-    private final static String GET_CURRENT_USER = "https://www.toggl.com/api/v6/me.json";
-    private String user;
-    private String password;
+    private final static String TIME_ENTRIES = "https://www.toggl.com/api/v8/time_entries";
+    private final static String TIME_ENTRY = "https://www.toggl.com/api/v8/time_entries/{0}";
+	private final static String TIME_ENTRY_START = "https://www.toggl.com/api/v8/time_entries/start";
+	private final static String TIME_ENTRY_STOP = "https://www.toggl.com/api/v8/time_entries/{0}/stop";
+    private final static String WORKSPACES = "https://www.toggl.com/api/v8/workspaces";
+	private final static String WORKSPACES_USERS = "https://www.toggl.com/api/v8/workspaces/{0}/users";
+	private final static String WORKSPACE_PROJECTS = "https://www.toggl.com/api/v8/workspaces/{0}/projects";
+	private final static String WORKSPACE_TASKS = "https://www.toggl.com/api/v8/workspaces/{0}/tasks";
+    private final static String CLIENTS = "https://www.toggl.com/api/v8/clients";
+    private final static String CLIENT = "https://www.toggl.com/api/v8/clients/{0}";
+    private final static String PROJECTS = "https://www.toggl.com/api/v8/projects";
+    private final static String PROJECT = "https://www.toggl.com/api/v8/projects/{0}";
+    private final static String TASKS = "https://www.toggl.com/api/v8/tasks";
+    private final static String TASK = "https://www.toggl.com/api/v8/tasks/{0}";
+    private final static String TAGS = "https://www.toggl.com/api/v8/tags";
+    private final static String PROJECT_USERS = "https://www.toggl.com/api/v8/workspaces/31366/project_users";
+    private final static String GET_CURRENT_USER = "https://www.toggl.com/api/v8/me";
+    private final String user;
+    private final String password;
     private boolean log = false;
 
     /**
@@ -101,13 +113,14 @@ public class JToggl {
             webResource = webResource.queryParams(queryParams);
         }
         String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
+        JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<TimeEntry> entries = new ArrayList<TimeEntry>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            entries.add(new TimeEntry(entryObject.toJSONString()));
+        if (data != null) {
+	        for (Object obj : data) {
+	            JSONObject entryObject = (JSONObject) obj;
+	            entries.add(new TimeEntry(entryObject.toJSONString()));
+	        }
         }
         return entries;
     }
@@ -132,6 +145,8 @@ public class JToggl {
 
         JSONObject object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
+        if (data == null)
+        	return null;
 
         return new TimeEntry(data.toJSONString());
     }
@@ -149,6 +164,47 @@ public class JToggl {
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
         String response = webResource.entity(
                 object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+        return new TimeEntry(data.toJSONString());
+    }
+    
+	/**
+	 * Create and then start the given time entry.
+	 * 
+	 * @param timeEntry
+	 *            the time entry to start
+	 * @return created {@link TimeEntry}
+	 */
+    public TimeEntry startTimeEntry(TimeEntry timeEntry) {
+        Client client = prepareClient();
+        WebResource webResource = client.resource(TIME_ENTRY_START);
+
+        JSONObject object = createTimeEntryRequestParameter(timeEntry);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+
+        object = (JSONObject) JSONValue.parse(response);
+        JSONObject data = (JSONObject) object.get(DATA);
+        return new TimeEntry(data.toJSONString());
+    }
+    
+	/**
+	 * Stop the given time entry.
+	 * 
+	 * @param timeEntry
+	 *            to time entry to stop
+	 * @return the stopped {@link TimeEntry}
+	 */
+    public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
+    	Client client = prepareClient();
+        String url = TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString());
+        WebResource webResource = client.resource(url);
+
+        JSONObject object = createTimeEntryRequestParameter(timeEntry);
+        String response = webResource.entity(
+                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -198,8 +254,7 @@ public class JToggl {
         WebResource webResource = client.resource(WORKSPACES);
 
         String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
+        JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<Workspace> workspaces = new ArrayList<Workspace>();
         for (Object obj : data) {
@@ -219,8 +274,7 @@ public class JToggl {
         WebResource webResource = client.resource(CLIENTS);
 
         String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
+        JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
         for (Object obj : data) {
@@ -288,18 +342,17 @@ public class JToggl {
      * @return list of {@link Project}
      */
     public List<Project> getProjects() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(PROJECTS);
-
-        String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
-
         List<Project> projects = new ArrayList<Project>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            projects.add(new Project(entryObject.toJSONString()));
-        }
+        
+        List<Workspace> workspaces = getWorkspaces();
+        for (Workspace workspace : workspaces) {
+			List<Project> workspaceProjects = getWorkspaceProjects(workspace.getId());
+			for (Project project : workspaceProjects) {
+				project.setWorkspace(workspace);
+			}
+			projects.addAll(workspaceProjects);
+		}
+
         return projects;
     }
 
@@ -367,18 +420,14 @@ public class JToggl {
      * @return list of {@link Task}
      */
     public List<Task> getTasks() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TASKS);
-
-        String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
-
         List<Task> tasks = new ArrayList<Task>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            tasks.add(new Task(entryObject.toJSONString()));
-        }
+        
+        List<Workspace> workspaces = getWorkspaces();
+        for (Workspace workspace : workspaces) {
+			List<Task> workspaceTasks = getActiveWorkspaceTasks(workspace.getId());
+			tasks.addAll(workspaceTasks);
+		}
+        
         return tasks;
     }
 
@@ -435,28 +484,6 @@ public class JToggl {
     }
 
     /**
-     * Get tags.
-     * 
-     * @return list of {@link Tag}
-     */
-    public List<Tag> getTags() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TAGS);
-
-        String response = webResource.get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONArray data = (JSONArray) object.get(DATA);
-
-        List<Tag> tags = new ArrayList<Tag>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            tags.add(new Tag(entryObject.toJSONString()));
-        }
-        return tags;
-
-    }
-
-    /**
      * Get current user.
      * 
      * @return current user {@link User}
@@ -483,6 +510,90 @@ public class JToggl {
         throw new UnsupportedOperationException();
     }
 
+	/**
+	 * All users in the workspace with the given id.
+	 * 
+	 * @param workspaceId
+	 *            id of the workspace
+	 * @return all users
+	 */
+	public List<User> getWorkspaceUsers(long workspaceId) {
+		Client client = prepareClient();
+		String url = WORKSPACES_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId));
+		WebResource webResource = client.resource(url);
+
+		String response = webResource.get(String.class);
+		JSONArray data = (JSONArray) JSONValue.parse(response);
+
+		List<User> users = new ArrayList<User>();
+		for (Object obj : data) {
+			JSONObject entryObject = (JSONObject) obj;
+			users.add(new User(entryObject.toJSONString()));
+		}
+		return users;
+	}
+	
+	/**
+	 * All projects in the workspace with the given id.
+	 * 
+	 * @param workspaceId
+	 *            id of the workspace
+	 * @return all projects
+	 */
+	public List<Project> getWorkspaceProjects(long workspaceId) {
+		Client client = prepareClient();
+		String url = WORKSPACE_PROJECTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
+		WebResource webResource = client.resource(url);
+
+		String response = webResource.get(String.class);
+		JSONArray data = (JSONArray) JSONValue.parse(response);
+
+		List<Project> projects = new ArrayList<Project>();
+		for (Object obj : data) {
+			JSONObject entryObject = (JSONObject) obj;
+			projects.add(new Project(entryObject.toJSONString()));
+		}
+		return projects;
+	}
+	
+	/**
+	 * All active tasks in the workspace with the given id.
+	 * 
+	 * @param workspaceId
+	 *            id of the workspace
+	 * @return all tasks
+	 */
+	public List<Task> getActiveWorkspaceTasks(long workspaceId) {
+		Client client = prepareClient();
+		String url = WORKSPACE_TASKS.replace(PLACEHOLDER, String.valueOf(workspaceId));
+		WebResource webResource = client.resource(url);
+
+		String response = webResource.get(String.class);
+		JSONArray data = (JSONArray) JSONValue.parse(response);
+
+		List<Task> tasks = new ArrayList<Task>();
+		for (Object obj : data) {
+			JSONObject entryObject = (JSONObject) obj;
+			tasks.add(new Task(entryObject.toJSONString()));
+		}
+		return tasks;
+	}
+
+	/**
+	 * All users in all workspaces.
+	 * 
+	 * @return all users in all workspaces
+	 */
+	public List<User> getUsers() {
+		HashSet<User> result = new HashSet<User>();
+		List<Workspace> workspaces = getWorkspaces();
+		for (Workspace workspace : workspaces) {
+			List<User> workspaceUsers = getWorkspaceUsers(workspace.getId());
+			result.addAll(workspaceUsers);
+		}
+		return new ArrayList<User>(result);
+	}
+
     /**
      * Switch logging on.
      */
@@ -498,7 +609,10 @@ public class JToggl {
     }
 
     private Client prepareClient() {
-        Client client = Client.create();
+		DefaultClientConfig clientConfig = new DefaultClientConfig();
+		clientConfig.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 30 * 1000);
+		clientConfig.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, 30 * 1000);
+		Client client = Client.create(clientConfig);
         client.addFilter(new HTTPBasicAuthFilter(user, password));
         if (log) {
             client.addFilter(new LoggingFilter());

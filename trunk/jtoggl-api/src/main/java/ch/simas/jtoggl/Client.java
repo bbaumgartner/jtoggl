@@ -32,6 +32,7 @@ public class Client {
     private String hourly_rate;
     private String currency;
     private Workspace workspace;
+    private String notes;
 
     public Client() {
     }
@@ -40,8 +41,9 @@ public class Client {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
         this.name = (String) object.get("name");
-        this.hourly_rate = (String) object.get("hourly_rate");
-        this.currency = (String) object.get("currency");
+        this.hourly_rate = (String) object.get("hrate");
+        this.currency = (String) object.get("cur");
+        this.notes = (String) object.get("notes");
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
         if (workspaceObject != null) {
@@ -80,6 +82,14 @@ public class Client {
     public void setHourly_rate(String hourly_rate) {
         this.hourly_rate = hourly_rate;
     }
+    
+    public String getNotes() {
+		return notes;
+	}
+    
+    public void setNotes(String notes) {
+		this.notes = notes;
+	}
 
     public Workspace getWorkspace() {
         return workspace;
@@ -98,14 +108,18 @@ public class Client {
             object.put("name", name);
         }
         if (hourly_rate != null) {
-            object.put("hourly_rate", hourly_rate);
+            object.put("hrate", hourly_rate);
         }
         if (currency != null) {
-            object.put("currency", currency);
+            object.put("cur", currency);
+        }
+        if (notes != null) {
+        	object.put("notes", notes);
         }
 
         if (workspace != null) {
             object.put("workspace", this.workspace.toJSONObject());
+            object.put("wid", this.workspace.getId());
         }
 
         return object;
@@ -117,7 +131,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return "Client{" + "id=" + id + ", name=" + name + ", hourly_rate=" + hourly_rate + ", currency=" + currency + ", workspace=" + workspace + '}';
+        return "Client{" + "id=" + id + ", name=" + name + ", hourly_rate=" + hourly_rate + ", currency=" + currency + ", notes=" + notes + ", workspace=" + workspace + '}';
     }
 
     @Override

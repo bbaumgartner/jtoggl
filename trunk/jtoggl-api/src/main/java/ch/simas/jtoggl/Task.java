@@ -29,7 +29,6 @@ public class Task {
 
     private Long id;
     private String name;
-    private Long estimated_workhours;
     private Long estimated_seconds;
     private Boolean is_active;
     private Workspace workspace;
@@ -43,9 +42,8 @@ public class Task {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
         this.name = (String) object.get("name");
-        this.estimated_workhours = (Long) object.get("estimated_workhours");
         this.estimated_seconds = (Long) object.get("estimated_seconds");
-        this.is_active = (Boolean) object.get("is_active");
+        this.is_active = (Boolean) object.get("active");
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
         if (workspaceObject != null) {
@@ -67,14 +65,6 @@ public class Task {
 
     public void setEstimated_seconds(Long estimated_seconds) {
         this.estimated_seconds = estimated_seconds;
-    }
-
-    public Long getEstimated_workhours() {
-        return estimated_workhours;
-    }
-
-    public void setEstimated_workhours(Long estimated_workhours) {
-        this.estimated_workhours = estimated_workhours;
     }
 
     public Long getId() {
@@ -133,24 +123,24 @@ public class Task {
         if (name != null) {
             object.put("name", name);
         }
-        if (estimated_workhours != null) {
-            object.put("estimated_workhours", estimated_workhours);
-        }
         if (estimated_seconds != null) {
             object.put("estimated_seconds", estimated_seconds);
         }
         if (is_active != null) {
-            object.put("is_active", is_active);
+            object.put("active", is_active);
         }
 
         if (workspace != null) {
             object.put("workspace", this.workspace.toJSONObject());
+            object.put("wid", this.workspace.getId());
         }
         if (project != null) {
             object.put("project", this.project.toJSONObject());
+            object.put("pid", this.project.getId());
         }
         if (user != null) {
             object.put("user", this.user.toJSONObject());
+            object.put("uid", this.user.getId());
         }
 
         return object;
@@ -162,7 +152,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", estimated_workhours=" + estimated_workhours + ", estimated_seconds=" + estimated_seconds + ", is_active=" + is_active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", estimated_seconds=" + estimated_seconds + ", is_active=" + is_active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
     }
 
     @Override

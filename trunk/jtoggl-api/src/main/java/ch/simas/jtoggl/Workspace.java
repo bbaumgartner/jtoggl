@@ -29,6 +29,7 @@ public class Workspace {
 
     private Long id;
     private String name;
+    private Boolean premium;
 
     public Workspace() {
     }
@@ -37,6 +38,7 @@ public class Workspace {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
         this.name = (String) object.get("name");
+        this.premium = (Boolean) object.get("premium");
     }
 
     public Long getId() {
@@ -55,6 +57,14 @@ public class Workspace {
         this.name = name;
     }
 
+    public Boolean getPremium() {
+		return premium;
+	}
+    
+    public void setPremium(Boolean premium) {
+		this.premium = premium;
+	}
+    
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
         if (id != null) {
@@ -62,6 +72,9 @@ public class Workspace {
         }
         if (name != null) {
             object.put("name", name);
+        }
+        if (premium != null) {
+        	object.put("premium", premium);
         }
         return object;
     }

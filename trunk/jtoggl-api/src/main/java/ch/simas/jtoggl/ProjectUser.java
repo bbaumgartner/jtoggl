@@ -39,7 +39,7 @@ public class ProjectUser {
     public ProjectUser(String jsonString) {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
-        this.hourly_rate = (Double) object.get("hourly_rate");
+        this.hourly_rate = (Double) object.get("rate");
         this.manager = (Boolean) object.get("manager");
 
         JSONObject projectObject = (JSONObject) object.get("project");
@@ -98,7 +98,7 @@ public class ProjectUser {
             object.put("id", id);
         }
         if (hourly_rate != null) {
-            object.put("hourly_rate", hourly_rate);
+            object.put("rate", hourly_rate);
         }
         if (manager != null) {
             object.put("manager", manager);

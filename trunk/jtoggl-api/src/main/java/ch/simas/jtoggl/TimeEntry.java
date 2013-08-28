@@ -18,13 +18,15 @@
  */
 package ch.simas.jtoggl;
 
-import ch.simas.jtoggl.util.DateUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+
+import ch.simas.jtoggl.util.DateUtil;
 
 /**
  * 
@@ -41,8 +43,10 @@ public class TimeEntry {
     private Boolean billable;
     private Workspace workspace;
     private List<String> tag_names = new ArrayList<String>();
-    private Boolean ignore_start_and_stop;
     private String created_with;
+    private Boolean duronly;
+	private Long pid;
+	private Long wid;
 
     public TimeEntry() {
     }
@@ -55,8 +59,10 @@ public class TimeEntry {
         this.stop = DateUtil.convertStringToDate((String) object.get("stop"));
         this.duration = (Long) object.get("duration");
         this.billable = (Boolean) object.get("billable");
-        this.ignore_start_and_stop = (Boolean) object.get("ignore_start_and_stop");
+        this.duronly = (Boolean) object.get("duronly");
         created_with = (String) object.get("created_with");
+		this.pid = (Long) object.get("pid");
+		this.wid = (Long) object.get("wid");
 
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
@@ -69,10 +75,12 @@ public class TimeEntry {
             this.project = new Project(projectObject.toJSONString());
         }
         // Tag names
-        JSONArray tagsArray = (JSONArray) object.get("tag_names");
+        JSONArray tagsArray = (JSONArray) object.get("tags");
         List<String> tags = new ArrayList<String>();
-        for (Object arrayObject : tagsArray) {
-            tags.add((String) arrayObject);
+        if (tagsArray != null) {
+	        for (Object arrayObject : tagsArray) {
+	            tags.add((String) arrayObject);
+	        }
         }
         this.tag_names = tags;
     }
@@ -108,14 +116,14 @@ public class TimeEntry {
     public void setId(Long id) {
         this.id = id;
     }
-
-    public Boolean isIgnore_start_and_stop() {
-        return ignore_start_and_stop;
-    }
-
-    public void setIgnore_start_and_stop(Boolean ignore_start_and_stop) {
-        this.ignore_start_and_stop = ignore_start_and_stop;
-    }
+    
+    public Boolean getDuronly() {
+		return duronly;
+	}
+    
+    public void setDuronly(Boolean duronly) {
+		this.duronly = duronly;
+	}
 
     public Project getProject() {
         return project;
@@ -123,6 +131,7 @@ public class TimeEntry {
 
     public void setProject(Project project) {
         this.project = project;
+		this.pid = project.getId();
     }
 
     public Date getStart() {
@@ -155,6 +164,7 @@ public class TimeEntry {
 
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
+		this.wid = workspace.getId();
     }
 
     public String getCreated_with() {
@@ -164,6 +174,22 @@ public class TimeEntry {
     public void setCreated_with(String created_with) {
         this.created_with = created_with;
     }
+
+	public Long getWid() {
+		return wid;
+	}
+
+	public void setWid(Long wid) {
+		this.wid = wid;
+	}
+
+	public Long getPid() {
+		return pid;
+	}
+
+	public void setPid(Long pid) {
+		this.pid = pid;
+	}
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
@@ -179,8 +205,8 @@ public class TimeEntry {
         if (id != null) {
             object.put("id", id);
         }
-        if (ignore_start_and_stop != null) {
-            object.put("ignore_start_and_stop", ignore_start_and_stop);
+        if (duronly != null) {
+            object.put("duronly", duronly);
         }
         if (start != null) {
             object.put("start", DateUtil.convertDateToString(start));
@@ -195,17 +221,21 @@ public class TimeEntry {
         if (!this.tag_names.isEmpty()) {
             JSONArray tag_names_arr = new JSONArray();
             tag_names_arr.addAll(this.tag_names);
-            object.put("tag_names", tag_names_arr);
+            object.put("tags", tag_names_arr);
         }
 
         if (project != null) {
             object.put("project", this.project.toJSONObject());
         }
-
+		if (pid != null) {
+			object.put("pid", this.pid);
+		}
         if (workspace != null) {
             object.put("workspace", this.workspace.toJSONObject());
         }
-
+		if (wid != null) {
+			object.put("wid", this.wid);
+		}
         return object;
     }
 
@@ -215,7 +245,7 @@ public class TimeEntry {
 
     @Override
     public String toString() {
-        return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" + start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" + workspace + ", tag_names=" + tag_names + ", ignore_start_and_stop=" + ignore_start_and_stop + '}';
+        return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" + start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" + workspace + ", tag_names=" + tag_names + ", duronly=" + duronly + '}';
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * 
@@ -37,6 +38,7 @@ public class JTogglTest {
     private static Client client;
     private static Project project;
     private static Task task;
+	private static Workspace workspace;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -47,6 +49,10 @@ public class JTogglTest {
         jToggl = new JToggl(togglApiToken, "api_token");
         jToggl.switchLoggingOn();
 
+        List<Workspace> workspaces = jToggl.getWorkspaces();
+        assertTrue(workspaces.size() > 0);
+        workspace = workspaces.get(0);
+        
         client = createClient();
         timeEntry = createTimeEntry();
         project = createProject();
@@ -79,6 +85,13 @@ public class JTogglTest {
 
         Assert.assertTrue(entries.isEmpty());
     }
+    
+    @Test
+    public void getTimeEntriesWithRange2() {
+        List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart(), timeEntry.getStop());
+
+        Assert.assertTrue(!entries.isEmpty());
+    }
 
     @Test
     public void getTimeEntry() {
@@ -103,6 +116,30 @@ public class JTogglTest {
 
         Assert.assertNotNull(te);
         Assert.assertEquals(DESCRIPTION, te.getDescription());
+    }
+    
+    @Test
+    public void startStopTimeEntry() throws Exception {
+    	TimeEntry timeEntry = new TimeEntry();
+    	timeEntry.setWorkspace(workspace);
+    	timeEntry.setProject(project);
+    	timeEntry.setDescription("ABCD");
+
+    	TimeEntry te = jToggl.startTimeEntry(timeEntry);
+
+    	try {
+    		Assert.assertNotNull(te.getId());//created
+    		Assert.assertTrue(te.getDuration() < 0);//running
+
+    		Thread.sleep(2000);
+
+    		TimeEntry stoppedTe = jToggl.stopTimeEntry(te);
+
+    		Assert.assertEquals(te.getId(), stoppedTe.getId());
+    		Assert.assertTrue(stoppedTe.toJSONString(), stoppedTe.getDuration() > 1); //stopped
+    	} finally {
+    		jToggl.destroyTimeEntry(te.getId());
+    	}
     }
 
     @Test
@@ -172,17 +209,17 @@ public class JTogglTest {
     }
 
     @Test
-    public void getTags() {
-        List<Tag> tags = jToggl.getTags();
-
-        Assert.assertFalse(tags.isEmpty());
-    }
-
-    @Test
     public void getCurrentUser() {
         User user = jToggl.getCurrentUser();
 
         Assert.assertNotNull(user);
+    }
+    
+    @Test
+    public void getAllUsers() {
+    	List<User> users = jToggl.getUsers();
+    	
+    	Assert.assertTrue(!users.isEmpty());
     }
 
     private static TimeEntry createTimeEntry() throws Exception {
@@ -206,6 +243,7 @@ public class JTogglTest {
     private static Client createClient() {
         Client cl = new Client();
         cl.setName("JUnit Client");
+        cl.setWorkspace(workspace);
 
         cl = jToggl.createClient(cl);
         Assert.assertNotNull(cl);
@@ -215,21 +253,23 @@ public class JTogglTest {
 
     private static Project createProject() {
         List<Project> projects = jToggl.getProjects();
-        if (projects.isEmpty()) {
-            Project pr = new Project();
-            pr.setName("JUnit Project");
-            pr.setClient(client);
+        for (Project project : projects) {
+			if ("JUnit Project".equals(project.getName())) {
+				return project;
+			}
+		}
+        
+        Project pr = new Project();
+        pr.setName("JUnit Project");
+        pr.setClient(client);
 
-            List<Workspace> ws = jToggl.getWorkspaces();
-            pr.setWorkspace(ws.get(0));
+        List<Workspace> ws = jToggl.getWorkspaces();
+        pr.setWorkspace(ws.get(0));
 
-            pr = jToggl.createProject(pr);
-            Assert.assertNotNull(pr);
+        pr = jToggl.createProject(pr);
+        Assert.assertNotNull(pr);
 
-            return pr;
-        } else {
-            return projects.get(0);
-        }
+        return pr;
     }
 
     private static Task createTask() {
