@@ -29,12 +29,12 @@ public class Project {
 
     private Long id;
     private String name;
-    private String client_project_name;
     private Boolean billable;
-    private Long estimated_workhours;
-    private Boolean automatically_calculate_estimated_workhours;
     private Client client;
     private Workspace workspace;
+    private Boolean active;
+    private Boolean is_private;
+    private Boolean template;
 
     public Project() {
     }
@@ -43,10 +43,10 @@ public class Project {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
         this.name = (String) object.get("name");
-        this.client_project_name = (String) object.get("client_project_name");
-        this.estimated_workhours = (Long) object.get("estimated_workhours");
         this.billable = (Boolean) object.get("billable");
-        this.automatically_calculate_estimated_workhours = (Boolean) object.get("automatically_calculate_estimated_workhours");
+        this.active = (Boolean) object.get("active");
+        this.is_private = (Boolean) object.get("is_private");
+        this.template = (Boolean) object.get("template");
 
         JSONObject clientObject = (JSONObject) object.get("client");
         if (clientObject != null) {
@@ -58,14 +58,6 @@ public class Project {
             this.workspace = new Workspace(workspaceObject.toJSONString());
         }
 
-    }
-
-    public String getClient_project_name() {
-        return client_project_name;
-    }
-
-    public void setClient_project_name(String client_project_name) {
-        this.client_project_name = client_project_name;
     }
 
     public Long getId() {
@@ -108,21 +100,6 @@ public class Project {
         this.billable = billable;
     }
 
-    public Boolean getAutomatically_calculate_estimated_workhours() {
-        return automatically_calculate_estimated_workhours;
-    }
-
-    public void setAutomatically_calculate_estimated_workhours(Boolean automatically_calculate_estimated_workhours) {
-        this.automatically_calculate_estimated_workhours = automatically_calculate_estimated_workhours;
-    }
-
-    public Long getEstimated_workhours() {
-        return estimated_workhours;
-    }
-
-    public void setEstimated_workhours(Long estimated_workhours) {
-        this.estimated_workhours = estimated_workhours;
-    }
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
@@ -132,17 +109,17 @@ public class Project {
         if (name != null) {
             object.put("name", name);
         }
-        if (client_project_name != null) {
-            object.put("client_project_name", client_project_name);
-        }
         if (billable != null) {
             object.put("billable", billable);
         }
-        if (estimated_workhours != null) {
-            object.put("estimated_workhours", estimated_workhours);
+        if (active != null) {
+        	object.put("active", active);
         }
-        if (automatically_calculate_estimated_workhours != null) {
-            object.put("automatically_calculate_estimated_workhours", automatically_calculate_estimated_workhours);
+        if (is_private != null) {
+        	object.put("is_private", is_private);
+        }
+        if (template != null) {
+        	object.put("template", template);
         }
         if (client != null) {
             object.put("client", this.client.toJSONObject());
@@ -160,7 +137,7 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", name=" + name + ", client_project_name=" + client_project_name + ", billable=" + billable + ", estimated_workhours=" + estimated_workhours + ", automatically_calculate_estimated_workhours=" + automatically_calculate_estimated_workhours + ", client=" + client + ", workspace=" + workspace + '}';
+        return "Project{" + "id=" + id + ", name=" + name + ", active=" + active + ", is_private=" + is_private + ", template=" + template + ", billable=" + billable + ", client=" + client + ", workspace=" + workspace + '}';
     }
 
     @Override

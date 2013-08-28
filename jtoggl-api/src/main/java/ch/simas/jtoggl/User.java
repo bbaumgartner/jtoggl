@@ -34,7 +34,6 @@ public class User {
     private String jquery_date_format;
     private String date_format;
     private Long default_workspace_id;
-    private Boolean new_time_entries_start_automatically;
     private String fullname;
     private String language;
     private Long beginning_of_week;
@@ -49,11 +48,10 @@ public class User {
         this.id = (Long) object.get("id");
         this.jquery_timeofday_format = (String) object.get("jquery_timeofday_format");
         this.api_token = (String) object.get("api_token");
-        this.time_entry_retention_days = (Long) object.get("time_entry_retention_days");
+        this.time_entry_retention_days = (Long) object.get("retention");
         this.jquery_date_format = (String) object.get("jquery_date_format");
         this.date_format = (String) object.get("date_format");
-        this.default_workspace_id = (Long) object.get("default_workspace_id");
-        this.new_time_entries_start_automatically = (Boolean) object.get("new_time_entries_start_automatically");
+        this.default_workspace_id = (Long) object.get("default_wid");
         this.fullname = (String) object.get("fullname");
         this.language = (String) object.get("language");
         this.beginning_of_week = (Long) object.get("beginning_of_week");
@@ -141,14 +139,6 @@ public class User {
         this.language = language;
     }
 
-    public Boolean getNew_time_entries_start_automatically() {
-        return new_time_entries_start_automatically;
-    }
-
-    public void setNew_time_entries_start_automatically(Boolean new_time_entries_start_automatically) {
-        this.new_time_entries_start_automatically = new_time_entries_start_automatically;
-    }
-
     public Long getTime_entry_retention_days() {
         return time_entry_retention_days;
     }
@@ -177,7 +167,7 @@ public class User {
             object.put("api_token", api_token);
         }
         if (time_entry_retention_days != null) {
-            object.put("api_token", time_entry_retention_days);
+            object.put("retention", time_entry_retention_days);
         }
         if (jquery_date_format != null) {
             object.put("jquery_date_format", jquery_date_format);
@@ -186,10 +176,7 @@ public class User {
             object.put("date_format", date_format);
         }
         if (default_workspace_id != null) {
-            object.put("default_workspace_id", default_workspace_id);
-        }
-        if (new_time_entries_start_automatically != null) {
-            object.put("new_time_entries_start_automatically", new_time_entries_start_automatically);
+            object.put("default_wid", default_workspace_id);
         }
         if (fullname != null) {
             object.put("fullname", fullname);
@@ -216,7 +203,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" + api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" + jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" + default_workspace_id + ", new_time_entries_start_automatically=" + new_time_entries_start_automatically + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" + beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
+        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" + api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" + jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" + default_workspace_id + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" + beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
     }
 
     @Override
