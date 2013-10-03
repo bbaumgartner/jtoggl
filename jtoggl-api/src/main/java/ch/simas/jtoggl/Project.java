@@ -30,11 +30,11 @@ public class Project {
     private Long id;
     private String name;
     private Boolean billable;
-    private Client client;
     private Workspace workspace;
     private Boolean active;
     private Boolean is_private;
     private Boolean template;
+    private Long cid;
 
     public Project() {
     }
@@ -47,11 +47,7 @@ public class Project {
         this.active = (Boolean) object.get("active");
         this.is_private = (Boolean) object.get("is_private");
         this.template = (Boolean) object.get("template");
-
-        JSONObject clientObject = (JSONObject) object.get("client");
-        if (clientObject != null) {
-            this.client = new Client(clientObject.toJSONString());
-        }
+        this.cid= (Long) object.get("cid");
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
         if (workspaceObject != null) {
@@ -76,13 +72,13 @@ public class Project {
         this.name = name;
     }
 
-    public Client getClient() {
-        return client;
-    }
+    public Long getCid() {
+		return cid;
+	}
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
+    public void setCid(Long cid) {
+		this.cid = cid;
+	}
 
     public Workspace getWorkspace() {
         return workspace;
@@ -121,8 +117,8 @@ public class Project {
         if (template != null) {
         	object.put("template", template);
         }
-        if (client != null) {
-            object.put("client", this.client.toJSONObject());
+        if (cid != null) {
+            object.put("client", this.cid);
         }
 
         if (workspace != null) {
@@ -137,7 +133,7 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", name=" + name + ", active=" + active + ", is_private=" + is_private + ", template=" + template + ", billable=" + billable + ", client=" + client + ", workspace=" + workspace + '}';
+        return "Project{" + "id=" + id + ", name=" + name + ", active=" + active + ", is_private=" + is_private + ", template=" + template + ", billable=" + billable + ", cid=" + cid + ", workspace=" + workspace + '}';
     }
 
     @Override

@@ -261,7 +261,7 @@ public class JTogglTest {
         
         Project pr = new Project();
         pr.setName("JUnit Project");
-        pr.setClient(client);
+        pr.setCid(client.getId());
 
         List<Workspace> ws = jToggl.getWorkspaces();
         pr.setWorkspace(ws.get(0));
