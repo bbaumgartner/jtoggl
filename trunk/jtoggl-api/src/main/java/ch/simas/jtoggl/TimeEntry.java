@@ -47,6 +47,7 @@ public class TimeEntry {
     private Boolean duronly;
 	private Long pid;
 	private Long wid;
+	private Long tid;
 
     public TimeEntry() {
     }
@@ -63,6 +64,7 @@ public class TimeEntry {
         created_with = (String) object.get("created_with");
 		this.pid = (Long) object.get("pid");
 		this.wid = (Long) object.get("wid");
+		this.tid = (Long) object.get("tid");
 
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
@@ -191,6 +193,14 @@ public class TimeEntry {
 		this.pid = pid;
 	}
 
+	public Long getTid() {
+		return tid;
+	}
+
+	public void setTid(Long tid) {
+		this.tid = tid;
+	}
+
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
         if (billable != null) {
@@ -236,6 +246,9 @@ public class TimeEntry {
 		if (wid != null) {
 			object.put("wid", this.wid);
 		}
+		if (tid != null) {
+			object.put("tid", this.tid);
+		}
         return object;
     }
 
@@ -245,7 +258,7 @@ public class TimeEntry {
 
     @Override
     public String toString() {
-        return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" + start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" + workspace + ", tag_names=" + tag_names + ", duronly=" + duronly + '}';
+		return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" + start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" + workspace + ", tag_names=" + tag_names + ", duronly=" + duronly + ", tid = " + tid + '}';
     }
 
     @Override
