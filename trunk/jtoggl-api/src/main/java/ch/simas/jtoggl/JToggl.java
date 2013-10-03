@@ -549,9 +549,11 @@ public class JToggl {
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
 		List<Project> projects = new ArrayList<Project>();
-		for (Object obj : data) {
-			JSONObject entryObject = (JSONObject) obj;
-			projects.add(new Project(entryObject.toJSONString()));
+		if (data != null) {
+			for (Object obj : data) {
+				JSONObject entryObject = (JSONObject) obj;
+				projects.add(new Project(entryObject.toJSONString()));
+			}
 		}
 		return projects;
 	}
