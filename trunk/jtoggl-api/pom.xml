@@ -57,4 +57,17 @@
         <developerConnection>scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api</developerConnection>
     </scm>
 
+	<distributionManagement>
+		<repository>
+			<id>comerge-deployment</id>
+			<name>Comerge Releases</name>
+			<url>http://pandora.comerge.net:8080/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>comerge-deployment</id>
+			<name>Comerge Snapshots</name>
+			<url>http://pandora.comerge.net:8080/nexus/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
