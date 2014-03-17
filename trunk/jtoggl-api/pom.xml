@@ -58,15 +58,13 @@
     </scm>
 
 	<distributionManagement>
-		<repository>
-			<id>comerge-deployment</id>
-			<name>Comerge Releases</name>
-			<url>http://pandora.comerge.net:8081/nexus/content/repositories/releases/</url>
+ 		<repository>
+		   <id>public_releases</id>
+		   <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>comerge-deployment</id>
-			<name>Comerge Snapshots</name>
-			<url>http://pandora.comerge.net:8081/nexus/content/repositories/snapshots/</url>
+		    <id>public_snapshots</id>
+		    <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 
