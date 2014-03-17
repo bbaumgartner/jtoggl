@@ -61,12 +61,12 @@
 		<repository>
 			<id>comerge-deployment</id>
 			<name>Comerge Releases</name>
-			<url>http://pandora.comerge.net:8080/nexus/content/repositories/releases/</url>
+			<url>http://pandora.comerge.net:8081/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>comerge-deployment</id>
 			<name>Comerge Snapshots</name>
-			<url>http://pandora.comerge.net:8080/nexus/nexus/content/repositories/snapshots/</url>
+			<url>http://pandora.comerge.net:8081/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
