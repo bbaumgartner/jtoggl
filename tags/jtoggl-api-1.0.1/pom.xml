@@ -1,0 +1,71 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ch.simas.jtoggl</groupId>
+    <artifactId>jtoggl-api</artifactId>
+    <version>1.0.1</version>
+    <packaging>jar</packaging>
+
+    <name>jtoggl-api</name>
+    <url>http://code.google.com/p/jtoggl/</url>
+    
+    <developers>
+        <developer>
+            <name>Simon Martinelli</name>
+            <organization>simas GmbH</organization>
+            <email>sm@simas.ch</email>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.10</version>
+        </dependency>    
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>    
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+         </plugins>
+    </build>
+            
+    <scm>
+        <developerConnection>scm:svn:https://jtoggl.googlecode.com/svn/tags/jtoggl-api-1.0.1</developerConnection>
+    </scm>
+
+	<distributionManagement>
+ 		<repository>
+		   <id>public_releases</id>
+		   <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_releases</url>
+		</repository>
+		<snapshotRepository>
+		    <id>public_snapshots</id>
+		    <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+</project>
