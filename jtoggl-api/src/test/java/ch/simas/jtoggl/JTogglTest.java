@@ -44,7 +44,10 @@ public class JTogglTest {
     public static void beforeClass() throws Exception {
         String togglApiToken = System.getenv("TOGGL_API_TOKEN");
         if (togglApiToken == null) {
-            throw new RuntimeException("TOGGL_API_TOKEN not set.");
+        	togglApiToken = System.getProperty("TOGGL_API_TOKEN");
+        	if (togglApiToken == null) {
+        		throw new RuntimeException("TOGGL_API_TOKEN not set.");
+        	}
         }
         jToggl = new JToggl(togglApiToken, "api_token");
         jToggl.switchLoggingOn();
