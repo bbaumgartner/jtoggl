@@ -58,6 +58,7 @@ public class JToggl {
 	private final static String WORKSPACES_USERS = "https://www.toggl.com/api/v8/workspaces/{0}/users";
 	private final static String WORKSPACE_PROJECTS = "https://www.toggl.com/api/v8/workspaces/{0}/projects";
 	private final static String WORKSPACE_TASKS = "https://www.toggl.com/api/v8/workspaces/{0}/tasks";
+	private final static String WORKSPACE_CLIENTS = "https://www.toggl.com/api/v8/workspaces/{0}/clients";
     private final static String CLIENTS = "https://www.toggl.com/api/v8/clients";
     private final static String CLIENT = "https://www.toggl.com/api/v8/clients/{0}";
     private final static String PROJECTS = "https://www.toggl.com/api/v8/projects";
@@ -70,6 +71,15 @@ public class JToggl {
     private final String user;
     private final String password;
     private boolean log = false;
+    
+    /**
+     * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
+     * 
+     * @param apiToken the api token to connect to toggl
+     */
+    public JToggl(String apiToken) {
+    	this(apiToken, "api_token");
+    }
 
     /**
      * Constructor to create an instance of JToggl.
@@ -559,6 +569,29 @@ public class JToggl {
 	}
 	
 	/**
+	 * All clients in the workspace with the given id.
+	 * 
+	 * @param workspaceId
+	 *            id of the workspace
+	 * @return all clients
+	 */
+	public List<ch.simas.jtoggl.Client> getWorkspaceClients(long workspaceId) {
+		Client client = prepareClient();
+		String url = WORKSPACE_CLIENTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
+		WebResource webResource = client.resource(url);
+
+		String response = webResource.get(String.class);
+		JSONArray data = (JSONArray) JSONValue.parse(response);
+
+        List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
+        for (Object obj : data) {
+            JSONObject entryObject = (JSONObject) obj;
+            clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
+        }
+        return clients;
+	}
+	
+	/**
 	 * All active tasks in the workspace with the given id.
 	 * 
 	 * @param workspaceId
@@ -597,7 +630,7 @@ public class JToggl {
 		}
 		return new ArrayList<User>(result);
 	}
-
+	
     /**
      * Switch logging on.
      */
