@@ -267,9 +267,11 @@ public class JToggl {
         JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<Workspace> workspaces = new ArrayList<Workspace>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            workspaces.add(new Workspace(entryObject.toJSONString()));
+        if (data != null) {
+	        for (Object obj : data) {
+	            JSONObject entryObject = (JSONObject) obj;
+	            workspaces.add(new Workspace(entryObject.toJSONString()));
+	        }
         }
         return workspaces;
     }
@@ -287,9 +289,11 @@ public class JToggl {
         JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
+        if (data != null) {
+	        for (Object obj : data) {
+	            JSONObject entryObject = (JSONObject) obj;
+	            clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
+	        }
         }
         return clients;
     }
@@ -536,9 +540,11 @@ public class JToggl {
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
 		List<User> users = new ArrayList<User>();
-		for (Object obj : data) {
-			JSONObject entryObject = (JSONObject) obj;
-			users.add(new User(entryObject.toJSONString()));
+		if (data != null) {
+			for (Object obj : data) {
+				JSONObject entryObject = (JSONObject) obj;
+				users.add(new User(entryObject.toJSONString()));
+			}
 		}
 		return users;
 	}
@@ -584,9 +590,11 @@ public class JToggl {
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
-        for (Object obj : data) {
-            JSONObject entryObject = (JSONObject) obj;
-            clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
+        if (data != null) {
+	        for (Object obj : data) {
+	            JSONObject entryObject = (JSONObject) obj;
+	            clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
+	        }
         }
         return clients;
 	}
