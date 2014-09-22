@@ -41,7 +41,10 @@ public class Client {
         JSONObject object = (JSONObject) JSONValue.parse(jsonString);
         this.id = (Long) object.get("id");
         this.name = (String) object.get("name");
-        this.hourly_rate = (String) object.get("hrate");
+        Object hrate = object.get("hrate");
+        if (hrate != null) {
+        	this.hourly_rate = hrate.toString();
+        }
         this.currency = (String) object.get("cur");
         this.notes = (String) object.get("notes");
 
