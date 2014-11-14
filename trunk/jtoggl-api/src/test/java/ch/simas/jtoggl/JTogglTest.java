@@ -127,6 +127,7 @@ public class JTogglTest {
     	timeEntry.setWorkspace(workspace);
     	timeEntry.setProject(project);
     	timeEntry.setDescription("ABCD");
+    	timeEntry.setCreated_with("JToggl Unit Test");
 
     	TimeEntry te = jToggl.startTimeEntry(timeEntry);
 
