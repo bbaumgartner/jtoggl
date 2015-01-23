@@ -39,6 +39,7 @@ public class User {
     private Long beginning_of_week;
     private String timeofday_format;
     private String email;
+    private String timeZone;
 
     public User() {
     }
@@ -57,6 +58,7 @@ public class User {
         this.beginning_of_week = (Long) object.get("beginning_of_week");
         this.timeofday_format = (String) object.get("timeofday_format");
         this.email = (String) object.get("email");
+        this.timeZone= (String) object.get("timezone");
     }
 
     public String getApi_token() {
@@ -150,6 +152,10 @@ public class User {
     public String getTimeofday_format() {
         return timeofday_format;
     }
+    
+    public String getTimeZone() {
+		return timeZone;
+	}
 
     public void setTimeofday_format(String timeofday_format) {
         this.timeofday_format = timeofday_format;
