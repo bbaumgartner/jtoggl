@@ -52,6 +52,7 @@ public class JToggl {
     public static final String PLACEHOLDER = "{0}";
     private final static String TIME_ENTRIES = "https://www.toggl.com/api/v8/time_entries";
     private final static String TIME_ENTRY = "https://www.toggl.com/api/v8/time_entries/{0}";
+	private final static String CURRENT_TIME_ENTRY = "https://www.toggl.com/api/v8/time_entries/current";
 	private final static String TIME_ENTRY_START = "https://www.toggl.com/api/v8/time_entries/start";
 	private final static String TIME_ENTRY_STOP = "https://www.toggl.com/api/v8/time_entries/{0}/stop";
     private final static String WORKSPACES = "https://www.toggl.com/api/v8/workspaces";
@@ -160,6 +161,30 @@ public class JToggl {
 
         return new TimeEntry(data.toJSONString());
     }
+
+	/**
+	 * Get running time entry
+	 * 
+	 * @return The running time entry or null if none
+	 */
+	public TimeEntry getCurrentTimeEntry() {
+		Client client = prepareClient();
+		WebResource webResource = client.resource(CURRENT_TIME_ENTRY);
+
+		String response = null;
+		try {
+			response = webResource.get(String.class);
+		} catch (UniformInterfaceException uniformInterfaceException) {
+			return null;
+		}
+
+		JSONObject object = (JSONObject) JSONValue.parse(response);
+		JSONObject data = (JSONObject) object.get(DATA);
+		if (data == null)
+			return null;
+
+		return new TimeEntry(data.toJSONString());
+	}
 
     /**
      * Create a new time entry.

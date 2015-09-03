@@ -18,14 +18,16 @@
  */
 package ch.simas.jtoggl;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * 
@@ -123,6 +125,9 @@ public class JTogglTest {
     
     @Test
     public void startStopTimeEntry() throws Exception {
+		TimeEntry current = jToggl.getCurrentTimeEntry();
+		Assert.assertNull(current);
+
     	TimeEntry timeEntry = new TimeEntry();
     	timeEntry.setWorkspace(workspace);
     	timeEntry.setProject(project);
@@ -135,12 +140,19 @@ public class JTogglTest {
     		Assert.assertNotNull(te.getId());//created
     		Assert.assertTrue(te.getDuration() < 0);//running
 
+			current = jToggl.getCurrentTimeEntry();
+			Assert.assertNotNull(current);
+			Assert.assertEquals(current.getId(), te.getId());
+
     		Thread.sleep(2000);
 
     		TimeEntry stoppedTe = jToggl.stopTimeEntry(te);
 
     		Assert.assertEquals(te.getId(), stoppedTe.getId());
     		Assert.assertTrue(stoppedTe.toJSONString(), stoppedTe.getDuration() > 1); //stopped
+
+			current = jToggl.getCurrentTimeEntry();
+			Assert.assertNull(current);
     	} finally {
     		jToggl.destroyTimeEntry(te.getId());
     	}
