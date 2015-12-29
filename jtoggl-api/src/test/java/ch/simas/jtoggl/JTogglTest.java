@@ -73,6 +73,7 @@ public class JTogglTest {
         } catch (Exception e) {
             // Ignore because Task is only for paying customers
         }
+        jToggl.destroyProject(project.getId());
     }
 
     @Test
@@ -174,13 +175,12 @@ public class JTogglTest {
 
     @Test
     public void updateClient() {
-        final String NAME = "ABC";
 
-        client.setName(NAME);
+        client.setNotes("Making more notes for update! " + new Date());
         Client cl = jToggl.updateClient(client);
 
         Assert.assertNotNull(cl);
-        Assert.assertEquals(NAME, cl.getName());
+        Assert.assertEquals(client.getNotes(), cl.getNotes());
     }
 
     @Test
@@ -206,10 +206,16 @@ public class JTogglTest {
 
     @Test
     public void getTasks() {
+    	boolean isPremium = false;
+    	List<Workspace> workspaces = jToggl.getWorkspaces();
+    	if (!workspaces.isEmpty())
+    	{
+    		isPremium = workspaces.get(0).getPremium();
+    	}
         List<Task> tasks = jToggl.getTasks();
 
         // TODO Task is only available in payed version
-        //Assert.assertFalse(tasks.isEmpty());
+        Assert.assertFalse(isPremium && tasks.isEmpty());
     }
 
     @Test
