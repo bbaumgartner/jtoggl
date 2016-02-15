@@ -40,6 +40,7 @@ public class User {
     private String timeofday_format;
     private String email;
     private String timeZone;
+	private String storeStartAndStopTime;
 
     public User() {
     }
@@ -59,6 +60,7 @@ public class User {
         this.timeofday_format = (String) object.get("timeofday_format");
         this.email = (String) object.get("email");
         this.timeZone= (String) object.get("timezone");
+        this.storeStartAndStopTime= (String) object.get("store_start_and_stop_time");
     }
 
     public String getApi_token() {
@@ -160,6 +162,14 @@ public class User {
     public void setTimeofday_format(String timeofday_format) {
         this.timeofday_format = timeofday_format;
     }
+    
+    public String getStoreStartAndStopTime() {
+		return storeStartAndStopTime;
+	}
+    
+    public void setStoreStartAndStopTime(String storeStartAndStopTime) {
+		this.storeStartAndStopTime = storeStartAndStopTime;
+	}
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
@@ -198,6 +208,9 @@ public class User {
         }
         if (email != null) {
             object.put("email", email);
+        }
+        if (storeStartAndStopTime != null) {
+        	object.put("store_start_and_stop_time", storeStartAndStopTime);
         }
 
         return object;
