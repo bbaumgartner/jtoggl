@@ -52,6 +52,7 @@ public class JTogglTest {
         	}
         }
         jToggl = new JToggl(togglApiToken, "api_token");
+        jToggl.setThrottlePeriod(500l);
         jToggl.switchLoggingOn();
 
         List<Workspace> workspaces = jToggl.getWorkspaces();
