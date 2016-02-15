@@ -31,6 +31,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import ch.simas.jtoggl.util.DateUtil;
+import ch.simas.jtoggl.util.DelayFilter;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -48,30 +49,45 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
  */
 public class JToggl {
 
+	public static final String API_ROOT = "https://www.toggl.com/api";
+	public static final int API_VERSION = 8;
+	public static final String API_BASE = String.format("%s/v%d/", API_ROOT, API_VERSION);
+	
     public static final String DATA = "data";
     public static final String PLACEHOLDER = "{0}";
-    private final static String TIME_ENTRIES = "https://www.toggl.com/api/v8/time_entries";
-    private final static String TIME_ENTRY = "https://www.toggl.com/api/v8/time_entries/{0}";
-	private final static String CURRENT_TIME_ENTRY = "https://www.toggl.com/api/v8/time_entries/current";
-	private final static String TIME_ENTRY_START = "https://www.toggl.com/api/v8/time_entries/start";
-	private final static String TIME_ENTRY_STOP = "https://www.toggl.com/api/v8/time_entries/{0}/stop";
-    private final static String WORKSPACES = "https://www.toggl.com/api/v8/workspaces";
-	private final static String WORKSPACES_USERS = "https://www.toggl.com/api/v8/workspaces/{0}/users";
-	private final static String WORKSPACE_PROJECTS = "https://www.toggl.com/api/v8/workspaces/{0}/projects";
-	private final static String WORKSPACE_TASKS = "https://www.toggl.com/api/v8/workspaces/{0}/tasks";
-	private final static String WORKSPACE_CLIENTS = "https://www.toggl.com/api/v8/workspaces/{0}/clients";
-    private final static String CLIENTS = "https://www.toggl.com/api/v8/clients";
-    private final static String CLIENT = "https://www.toggl.com/api/v8/clients/{0}";
-    private final static String PROJECTS = "https://www.toggl.com/api/v8/projects";
-    private final static String PROJECT = "https://www.toggl.com/api/v8/projects/{0}";
-    private final static String TASKS = "https://www.toggl.com/api/v8/tasks";
-    private final static String TASK = "https://www.toggl.com/api/v8/tasks/{0}";
-    private final static String TAGS = "https://www.toggl.com/api/v8/tags";
-    private final static String PROJECT_USERS = "https://www.toggl.com/api/v8/workspaces/31366/project_users";
-    private final static String GET_CURRENT_USER = "https://www.toggl.com/api/v8/me";
+    public static final String SIMPLE_ID_PATH = "/" + PLACEHOLDER;
+    
+    private final static String TIME_ENTRIES = API_BASE + "time_entries";
+    private final static String TIME_ENTRY_BY_ID = TIME_ENTRIES + SIMPLE_ID_PATH;
+	private final static String TIME_ENTRY_CURRENT = TIME_ENTRIES + "/current";
+	private final static String TIME_ENTRY_START = TIME_ENTRIES + "/start";
+	private final static String TIME_ENTRY_STOP = TIME_ENTRIES + SIMPLE_ID_PATH + "/stop";
+	
+    private final static String WORKSPACES = API_BASE + "workspaces";
+    private final static String WORKSPACE_BY_ID = WORKSPACES + SIMPLE_ID_PATH;
+	private final static String WORKSPACE_USERS = WORKSPACE_BY_ID + "/users";
+	private final static String WORKSPACE_PROJECTS = WORKSPACE_BY_ID + "/projects";
+	private final static String WORKSPACE_TASKS = WORKSPACE_BY_ID + "/tasks";
+	private final static String WORKSPACE_CLIENTS = WORKSPACE_BY_ID + "/clients";
+	
+    private final static String CLIENTS = API_BASE + "clients";
+    private final static String CLIENT_BY_ID = CLIENTS + SIMPLE_ID_PATH;
+    
+    private final static String PROJECTS = API_BASE + "projects";
+    private final static String PROJECT_BY_ID = PROJECTS + SIMPLE_ID_PATH;
+    
+    private final static String TASKS = API_BASE + "tasks";
+    private final static String TASK_BY_ID = TASKS + SIMPLE_ID_PATH;
+    
+    private final static String TAGS = API_BASE + "tags";
+    
+    private final static String PROJECT_USERS = WORKSPACES + "/673279/project_users";
+    private final static String GET_CURRENT_USER = API_BASE + "me";
     private final String user;
     private final String password;
+    
     private boolean log = false;
+    private long throttlePeriod = 500L;
     
     /**
      * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
@@ -118,7 +134,7 @@ public class JToggl {
         WebResource webResource = client.resource(TIME_ENTRIES);
 
         if (startDate != null && endDate != null) {
-            MultivaluedMap queryParams = new MultivaluedMapImpl();
+            MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
             queryParams.add("start_date", DateUtil.convertDateToString(startDate));
             queryParams.add("end_date", DateUtil.convertDateToString(endDate));
             webResource = webResource.queryParams(queryParams);
@@ -144,7 +160,7 @@ public class JToggl {
      */
     public TimeEntry getTimeEntry(Long id) {
         Client client = prepareClient();
-        String url = TIME_ENTRY.replace(PLACEHOLDER, id.toString());
+        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
         WebResource webResource = client.resource(url);
 
         String response = null;
@@ -169,7 +185,7 @@ public class JToggl {
 	 */
 	public TimeEntry getCurrentTimeEntry() {
 		Client client = prepareClient();
-		WebResource webResource = client.resource(CURRENT_TIME_ENTRY);
+		WebResource webResource = client.resource(TIME_ENTRY_CURRENT);
 
 		String response = null;
 		try {
@@ -254,7 +270,7 @@ public class JToggl {
      */
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
         Client client = prepareClient();
-        String url = TIME_ENTRY.replace(PLACEHOLDER, timeEntry.getId().toString());
+        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString());
         WebResource webResource = client.resource(url);
 
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
@@ -273,12 +289,25 @@ public class JToggl {
      */
     public void destroyTimeEntry(Long id) {
         Client client = prepareClient();
-        String url = TIME_ENTRY.replace(PLACEHOLDER, id.toString());
+        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
         WebResource webResource = client.resource(url);
 
         webResource.delete(String.class);
     }
 
+	/**
+	 * Destroy a project.
+	 * 
+	 * @param id
+	 */
+	public void destroyProject(Long id) {
+		Client client = prepareClient();
+        String url = PROJECT_BY_ID.replace(PLACEHOLDER, id.toString());
+        WebResource webResource = client.resource(url);
+        webResource.delete(String.class);
+	}
+
+    
     /**
      * Get workspaces.
      * 
@@ -350,7 +379,7 @@ public class JToggl {
      */
     public ch.simas.jtoggl.Client updateClient(ch.simas.jtoggl.Client clientObject) {
         Client client = prepareClient();
-        String url = CLIENT.replace(PLACEHOLDER, clientObject.getId().toString());
+        String url = CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString());
         WebResource webResource = client.resource(url);
 
         JSONObject object = createClientRequestParameter(clientObject);
@@ -369,7 +398,7 @@ public class JToggl {
      */
     public void destroyClient(Long id) {
         Client client = prepareClient();
-        String url = CLIENT.replace(PLACEHOLDER, id.toString());
+        String url = CLIENT_BY_ID.replace(PLACEHOLDER, id.toString());
         WebResource webResource = client.resource(url);
 
         webResource.delete(String.class);
@@ -421,7 +450,7 @@ public class JToggl {
      */
     public Project updateProject(Project project) {
         Client client = prepareClient();
-        String url = PROJECT.replace(PLACEHOLDER, project.getId().toString());
+        String url = PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString());
         WebResource webResource = client.resource(url);
 
         JSONObject object = createProjectRequestParameter(project);
@@ -497,7 +526,7 @@ public class JToggl {
      */
     public Task updateTask(Task task) {
         Client client = prepareClient();
-        String url = TASK.replace(PLACEHOLDER, task.getId().toString());
+        String url = TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString());
         WebResource webResource = client.resource(url);
 
         JSONObject object = createTaskRequestParameter(task);
@@ -516,7 +545,7 @@ public class JToggl {
      */
     public void destroyTask(Long id) {
         Client client = prepareClient();
-        String url = TASK.replace(PLACEHOLDER, id.toString());
+        String url = TASK_BY_ID.replace(PLACEHOLDER, id.toString());
         WebResource webResource = client.resource(url);
 
         webResource.delete(String.class);
@@ -558,7 +587,7 @@ public class JToggl {
 	 */
 	public List<User> getWorkspaceUsers(long workspaceId) {
 		Client client = prepareClient();
-		String url = WORKSPACES_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId));
+		String url = WORKSPACE_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId));
 		WebResource webResource = client.resource(url);
 
 		String response = webResource.get(String.class);
@@ -685,10 +714,16 @@ public class JToggl {
 		Client client = Client.create(clientConfig);
         client.addFilter(new HTTPBasicAuthFilter(user, password));
         if (log) {
-            client.addFilter(new LoggingFilter());
+            LoggingFilter loggingFilter = new LoggingFilter();
+			client.addFilter(loggingFilter);
+        }
+        if (throttlePeriod > 0L)
+        {
+        	client.addFilter(new DelayFilter(throttlePeriod));
         }
         return client;
     }
+
 
     private JSONObject createTimeEntryRequestParameter(TimeEntry timeEntry) {
         JSONObject object = new JSONObject();
@@ -719,4 +754,13 @@ public class JToggl {
         object.put("task", task.toJSONObject());
         return object;
     }
+
+	public long getThrottlePeriod() {
+		return throttlePeriod;
+	}
+
+	public void setThrottlePeriod(long throttlePeriod) {
+		this.throttlePeriod = throttlePeriod;
+	}
+
 }
