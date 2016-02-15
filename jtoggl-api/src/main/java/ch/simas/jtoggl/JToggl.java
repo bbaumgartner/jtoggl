@@ -87,7 +87,7 @@ public class JToggl {
     private final String password;
     
     private boolean log = false;
-    private long throttlePeriod = 500L;
+    private long throttlePeriod = 0L;
     
     /**
      * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
