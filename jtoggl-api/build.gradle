@@ -5,10 +5,11 @@ apply plugin: 'maven'
 version = '1.0.4-SNAPSHOT'
 group = 'ch.simas.jtoggl'
 
-import org.w3c.dom.Element
-
 Properties buildProps = new Properties()
 buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
+
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
 
 buildscript {
 	repositories {
@@ -16,11 +17,12 @@ buildscript {
 	}
 }
 
+/*
 			Action<XmlProvider> buildPom(final Map pom){
 				return new Action<XmlProvider>() {
 					void execute(XmlProvider t) {
 						def node = t.asNode();
-						/* logger.info("0XXXXXXXXXXXXXXXXXXX")
+						 logger.info("0XXXXXXXXXXXXXXXXXXX")
 						pom.each { k, v ->
 							logger.info("name: $k; value: $v")
 							def tp = v instanceof Map
@@ -48,7 +50,7 @@ buildscript {
 							}
 							logger.info("5XXXXXXXXXXXXXXXXXXX")
 						}
-*/
+
 						node.appendNode('url', 'http://code.google.com/p/jtoggl')
 						node.appendNode('name', 'jtoggl-api')
 						def scm = node.appendNode('scm')
@@ -70,12 +72,12 @@ buildscript {
 					}
 				}
 			}
-
+*/
 publishing {
 	publications {
 		maven(MavenPublication) {
 			from components.java
-			def pm = buildPom ([
+			/*def pm = buildPom ([
 					url: 'http://code.google.com/p/jtoggl',
 					name: 'jtoggl-api',
 					scm: [
@@ -98,8 +100,28 @@ publishing {
 						'project.build.sourceEncoding': 'UTF-8',
 						'project.reporting.outputEncoding': 'UTF-8'
 					]
-			])
-			pom.withXml (pm)
+			])*/
+			pom.withXml {
+                def node = asNode()
+                node.appendNode('url', 'http://code.google.com/p/jtoggl')
+                node.appendNode('name', 'jtoggl-api')
+                def scm = node.appendNode('scm')
+                scm.appendNode('developerConnection', 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api')
+                scm.appendNode('url', 'http://code.google.com/p/jtoggl')
+                def developers = node.appendNode('developers')
+                def developer = developers.appendNode('developer')
+                developer.appendNode('name', 'Simon Martinelli')
+                developer.appendNode('organization', 'simas GmbH')
+                developer.appendNode('email', 'sm@simas.ch')
+                developer = developers.appendNode('developer')
+                developer.appendNode('name', 'Petr Vraník')
+                developer.appendNode('organization', 'SuTeren')
+                developer.appendNode('email', 'petr@vranik.name')
+                def props = node.appendNode('properties')
+                props.appendNode('project.build.sourceEncoding', 'UTF-8')
+                props.appendNode('project.reporting.outputEncoding', 'UTF-8')
+
+            }
 		}
 	}
 }
@@ -124,9 +146,9 @@ uploadArchives {
 }
 
 dependencies {
-	compile 'org.glassfish.jersey.core:jersey-client:2.12'
-	compile 'com.sun.jersey:jersey-client:1.18.1'
-	compile 'com.googlecode.json-simple:json-simple:1.1.1'
-	testCompile 'junit:junit:4.10'
+	compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+	compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    testCompile 'junit:junit:4.10'
 	deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }

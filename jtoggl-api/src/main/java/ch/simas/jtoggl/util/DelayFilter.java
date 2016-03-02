@@ -1,9 +1,5 @@
 package ch.simas.jtoggl.util;
 
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.filter.ClientFilter;
 
 /**
  * A ClientFilter implementation that delays for a fixed period of time before allowing the next
