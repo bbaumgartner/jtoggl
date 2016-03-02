@@ -21,7 +21,9 @@ package ch.simas.jtoggl;
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -689,12 +691,12 @@ public class JToggl {
 
     private Client prepareClient() {
         Configuration clientConfig = new ClientConfig();
-        clientConfig.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 30 * 1000);
-        clientConfig.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, 30 * 1000);
+        clientConfig.getProperties().put(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
+        clientConfig.getProperties().put(ClientProperties.READ_TIMEOUT, 30 * 1000);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
                                 //Client.create(clientConfig);
-        client.register(new HTTPBasicAuthFilter(user, password));
+        client.register(HttpAuthenticationFeature.basic(user, password));
         if (log) {
             LoggingFilter loggingFilter = new LoggingFilter();
             client.register(loggingFilter);
