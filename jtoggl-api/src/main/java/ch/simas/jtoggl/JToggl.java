@@ -695,8 +695,7 @@ public class JToggl {
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
-                                //Client.create(clientConfig);
-//        client.register(HttpAuthenticationFeature.basic(user, password));
+        client.register(HttpAuthenticationFeature.basic(user, password));
         if (log) {
             LoggingFilter loggingFilter = new LoggingFilter();
             client.register(loggingFilter);
