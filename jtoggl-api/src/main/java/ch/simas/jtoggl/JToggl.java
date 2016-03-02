@@ -690,13 +690,13 @@ public class JToggl {
     }
 
     private Client prepareClient() {
-        Configuration clientConfig = new ClientConfig();
-        clientConfig.getProperties().put(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
-        clientConfig.getProperties().put(ClientProperties.READ_TIMEOUT, 30 * 1000);
+        ClientConfig clientConfig = new ClientConfig();
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
+        clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
                                 //Client.create(clientConfig);
-        client.register(HttpAuthenticationFeature.basic(user, password));
+//        client.register(HttpAuthenticationFeature.basic(user, password));
         if (log) {
             LoggingFilter loggingFilter = new LoggingFilter();
             client.register(loggingFilter);

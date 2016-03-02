@@ -128,14 +128,12 @@ publishing {
 
 repositories {
 	jcenter()
-	maven {
-		url "https://github.com/konikvranik/repository"
-	}
 }
 configurations {
 	deployerJars
 }
 
+/*
 uploadArchives {
 	repositories.mavenDeployer {
 		configuration = configurations.deployerJars
@@ -144,7 +142,7 @@ uploadArchives {
 		}
 	}
 }
-
+*/
 dependencies {
 	compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
