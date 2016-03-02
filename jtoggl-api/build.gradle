@@ -1,0 +1,56 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+version = '1.0.0-SNAPSHOT'
+group = 'ch.simas.jtoggl'
+
+
+/*
+artifacts {
+    archives(build/libs/jtoggl-api.jar) {
+        name 'ch.simas.jtoggl:jtoggl-api:1.0.3-SNAPSHOT'
+        type 'jar'
+        builtBy assemble
+    }
+}
+uploadArchives {
+    repositories {
+        add project.repositories.fileRepo
+        maven {
+            credentials {
+                username "username"
+                password "pw"
+            }
+            url "http://repo.mycompany.com"
+        }
+    }
+}
+
+
+artifacts {
+    archives file: generate.destFile, name: 'my-artifact', type: 'text', builtBy: generate
+}
+*/
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+repositories {
+	jcenter()
+	maven {
+		url "http://pandora.comerge.net:8081/nexus/content/repositories/public_snapshots/"
+	}
+	maven {
+		url "https://github.com/konikvranik/repository"
+	}
+	//add buildscript.repositories.getByName("maven-main-cache")
+}
+
+dependencies {
+	compile 'com.sun.jersey:jersey-client:1.18.1'
+	compile 'com.googlecode.json-simple:json-simple:1.1.1'
+	testCompile 'junit:junit:4.10'
+}
