@@ -1,56 +1,69 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
-version = '1.0.0-SNAPSHOT'
+version = '1.0.4-SNAPSHOT'
 group = 'ch.simas.jtoggl'
 
 
-/*
-artifacts {
-    archives(build/libs/jtoggl-api.jar) {
-        name 'ch.simas.jtoggl:jtoggl-api:1.0.3-SNAPSHOT'
-        type 'jar'
-        builtBy assemble
-    }
-}
-uploadArchives {
-    repositories {
-        add project.repositories.fileRepo
-        maven {
-            credentials {
-                username "username"
-                password "pw"
-            }
-            url "http://repo.mycompany.com"
-        }
-    }
-}
-
-
-artifacts {
-    archives file: generate.destFile, name: 'my-artifact', type: 'text', builtBy: generate
-}
-*/
+Properties buildProps = new Properties()
+buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
 
 buildscript {
-    repositories {
-        jcenter()
-    }
+	repositories {
+		jcenter()
+	}
+}
+
+publishing {
+	publications {
+		maven(MavenPublication) {
+			from components.java
+			pom.withXml {
+				asNode().appendNode('url', 'http://code.google.com/p/jtoggl')
+				asNode().appendNode('name', 'jtoggl-api')
+				def scm = asNode().appendNode('scm')
+				scm.appendNode('developerConnection', 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api')
+				scm.appendNode('url', 'http://code.google.com/p/jtoggl')
+				def developers = asNode().appendNode('developers')
+				def developer = developers.appendNode('developer')
+				developer.appendNode('name', 'Simon Martinelli')
+				developer.appendNode('organization', 'simas GmbH')
+				developer.appendNode('email', 'sm@simas.ch')
+				developer = developers.appendNode('developer')
+				developer.appendNode('name', 'Petr Vraník')
+				developer.appendNode('organization', 'SuTeren')
+				developer.appendNode('email', 'petr@vranik.name')
+				def props = asNode().appendNode('properties')
+				props.appendNode('project.build.sourceEncoding', 'UTF-8')
+				props.appendNode('project.reporting.outputEncoding', 'UTF-8')
+			}
+		}
+	}
 }
 
 repositories {
 	jcenter()
 	maven {
-		url "http://pandora.comerge.net:8081/nexus/content/repositories/public_snapshots/"
-	}
-	maven {
 		url "https://github.com/konikvranik/repository"
 	}
-	//add buildscript.repositories.getByName("maven-main-cache")
+}
+configurations {
+	deployerJars
+}
+
+uploadArchives {
+	repositories.mavenDeployer {
+		configuration = configurations.deployerJars
+		repository(url: "scp://github.com/konikvranik/repository") {
+			authentication(userName: buildProps.getProperty('repository.username'), password: buildProps.getProperty('repository.password'))
+		}
+	}
 }
 
 dependencies {
 	compile 'com.sun.jersey:jersey-client:1.18.1'
 	compile 'com.googlecode.json-simple:json-simple:1.1.1'
 	testCompile 'junit:junit:4.10'
+	deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
