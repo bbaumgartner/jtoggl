@@ -20,6 +20,7 @@ package ch.simas.jtoggl;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,12 +44,32 @@ public class JTogglTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
+
+        String togglUsername = System.getenv("TOGGL_USER_NAME");
+        if (togglUsername == null) {
+            togglUsername = System.getProperty("TOGGL_USER_NAME");
+        }
+        String togglPassword = System.getenv("TOGGL_PASSWORD");
+        if (togglPassword == null) {
+            togglPassword = System.getProperty("TOGGL_PASSWORD");
+        }
+
         String togglApiToken = System.getenv("TOGGL_API_TOKEN");
         if (togglApiToken == null) {
             togglApiToken = System.getProperty("TOGGL_API_TOKEN");
-            if (togglApiToken == null) {
-                throw new RuntimeException("TOGGL_API_TOKEN not set.");
+        }
+        if (togglApiToken == null) {
+            if (togglUsername == null) {
+                throw new RuntimeException("TOGGL_USER_NAME not set.");
             }
+            if (togglPassword == null) {
+                throw new RuntimeException("TOGGL_PASSWORD not set.");
+            }
+            togglPassword=Base64.getEncoder().encodeToString(togglPassword.getBytes());
+            togglApiToken = new JToggl(togglUsername, togglPassword).getCurrentUser().getApi_token();
+        }
+        if (togglApiToken == null) {
+            throw new RuntimeException("TOGGL_API_TOKEN not set.");
         }
         jToggl = new JToggl(togglApiToken, "api_token");
         jToggl.setThrottlePeriod(500l);
@@ -61,7 +82,8 @@ public class JTogglTest {
         client = createClient();
         timeEntry = createTimeEntry();
         project = createProject();
-        task = createTask();
+        if (workspace.getPremium())
+            task = createTask();
     }
 
     @AfterClass
@@ -199,7 +221,9 @@ public class JTogglTest {
         Project pr = jToggl.updateProject(project);
 
         Assert.assertNotNull(pr);
-        Assert.assertTrue(pr.isBillable());
+        if (workspace.getPremium()) {
+            Assert.assertTrue(pr.isBillable());
+        }
     }
 
     @Test
@@ -222,6 +246,7 @@ public class JTogglTest {
 
     @Test
     public void updateTask() {
+        if (task == null) return;
         task.setIs_active(false);
         try {
             Task t = jToggl.updateTask(task);
