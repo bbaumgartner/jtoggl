@@ -32,7 +32,6 @@ import org.json.simple.JSONValue;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Date;
