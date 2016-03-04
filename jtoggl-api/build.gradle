@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 
-version = '2.0.1-SNAPSHOT'
+version = 'jackson-2.0.1-SNAPSHOT'
 group = 'ch.simas.jtoggl'
 
 Properties buildProps = new Properties()
