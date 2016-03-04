@@ -28,10 +28,13 @@ import org.json.simple.JSONValue;
 
 import ch.simas.jtoggl.util.DateUtil;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * 
  * @author Simon Martinelli
  */
+@XmlRootElement
 public class TimeEntry {
 
     private Long id;

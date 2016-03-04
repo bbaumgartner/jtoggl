@@ -20,19 +20,24 @@ package ch.simas.jtoggl;
 
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
+import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.json.JsonObject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -298,20 +303,11 @@ public class JToggl {
      * @return list of {@link Workspace}
      */
     public List<Workspace> getWorkspaces() {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(WORKSPACES);
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<Workspace> workspaces = new ArrayList<Workspace>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                workspaces.add(new Workspace(entryObject.toJSONString()));
-            }
-        }
-        return workspaces;
+       return  prepareClient()
+                .target(WORKSPACES)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get(new GenericType<List<Workspace>>() {});
     }
 
     /**
@@ -695,6 +691,7 @@ public class JToggl {
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
+       // client.register(new MoxyJsonFeature());
         if (log) {
             LoggingFilter loggingFilter = new LoggingFilter();
             client.register(loggingFilter);

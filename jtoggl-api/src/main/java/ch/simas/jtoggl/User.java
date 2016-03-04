@@ -21,11 +21,14 @@ package ch.simas.jtoggl;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * 
  * @author Simon Martinelli
  */
-public class User {
+@XmlRootElement(name="data")
+public class User extends Data {
 
     private Long id;
     private String jquery_timeofday_format;

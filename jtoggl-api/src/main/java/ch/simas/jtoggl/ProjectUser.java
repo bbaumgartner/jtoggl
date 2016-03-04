@@ -21,10 +21,13 @@ package ch.simas.jtoggl;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * 
  * @author Simon Martinelli
  */
+@XmlRootElement
 public class ProjectUser {
 
     private Long id;
