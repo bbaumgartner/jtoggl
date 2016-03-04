@@ -8,13 +8,13 @@ group = 'ch.simas.jtoggl'
 Properties buildProps = new Properties()
 buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 buildscript {
-	repositories {
-		jcenter()
-	}
+    repositories {
+        jcenter()
+    }
 }
 
 /*
@@ -74,34 +74,34 @@ buildscript {
 			}
 */
 publishing {
-	publications {
-		maven(MavenPublication) {
-			from components.java
-			/*def pm = buildPom ([
-					url: 'http://code.google.com/p/jtoggl',
-					name: 'jtoggl-api',
-					scm: [
-						developerConnection: 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api',
-						url: 'http://code.google.com/p/jtoggl'
-					],
-					developers: [
-						developer: [
-							name: 'Simon Martinelli',
-							organization: 'simas GmbH',
-							email: 'sm@simas.ch'
-						],
-						developer: [
-							name: 'Petr Vraník',
-							organization: 'SuTeren',
-							email: 'petr@vranik.name'
-						],
-					],
-					properties: [
-						'project.build.sourceEncoding': 'UTF-8',
-						'project.reporting.outputEncoding': 'UTF-8'
-					]
-			])*/
-			pom.withXml {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            /*def pm = buildPom ([
+                    url: 'http://code.google.com/p/jtoggl',
+                    name: 'jtoggl-api',
+                    scm: [
+                        developerConnection: 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api',
+                        url: 'http://code.google.com/p/jtoggl'
+                    ],
+                    developers: [
+                        developer: [
+                            name: 'Simon Martinelli',
+                            organization: 'simas GmbH',
+                            email: 'sm@simas.ch'
+                        ],
+                        developer: [
+                            name: 'Petr Vraník',
+                            organization: 'SuTeren',
+                            email: 'petr@vranik.name'
+                        ],
+                    ],
+                    properties: [
+                        'project.build.sourceEncoding': 'UTF-8',
+                        'project.reporting.outputEncoding': 'UTF-8'
+                    ]
+            ])*/
+            pom.withXml {
                 def node = asNode()
                 node.appendNode('url', 'http://code.google.com/p/jtoggl')
                 node.appendNode('name', 'jtoggl-api')
@@ -122,15 +122,15 @@ publishing {
                 props.appendNode('project.reporting.outputEncoding', 'UTF-8')
 
             }
-		}
-	}
+        }
+    }
 }
 
 repositories {
-	jcenter()
+    jcenter()
 }
 configurations {
-	deployerJars
+    deployerJars
 }
 
 /*
@@ -145,12 +145,12 @@ uploadArchives {
 */
 dependencies {
 
-	compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
+    compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
     compile 'org.glassfish.jersey.media:jersey-media-moxy:2.22.2'
-	compile 'javax.xml.bind:jaxb-api:2.2.12'
-	compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+    compile 'javax.xml.bind:jaxb-api:2.2.12'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
     testCompile 'junit:junit:4.10'
 
-	deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+    deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
