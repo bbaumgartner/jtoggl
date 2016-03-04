@@ -38,7 +38,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -47,10 +47,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ContextResolver;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -527,7 +525,8 @@ public class JToggl {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
-        clientConfig.register(createMoxyJsonResolver());
+        //clientConfig.register(createMoxyJsonResolver());
+        clientConfig.register(JacksonFeature.class);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
@@ -541,14 +540,15 @@ public class JToggl {
         return client;
     }
 
-    public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
-        final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
-        Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
-        namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
-        moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
-        return moxyJsonConfig.resolver();
-    }
-
+    /*
+        public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
+            final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
+            Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
+            namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+            moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
+            return moxyJsonConfig.resolver();
+        }
+    */
     public long getThrottlePeriod() {
         return throttlePeriod;
     }
@@ -571,5 +571,4 @@ public class JToggl {
     private Invocation.Builder prepareRequest(String url) {
         return prepareRequest(url, null);
     }
-
 }

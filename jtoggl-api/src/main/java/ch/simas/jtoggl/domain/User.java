@@ -19,6 +19,9 @@
 package ch.simas.jtoggl.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -27,6 +30,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Simon Martinelli
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends AbstractDataWrapper<User> implements IData<User> {
 
     private Long id;

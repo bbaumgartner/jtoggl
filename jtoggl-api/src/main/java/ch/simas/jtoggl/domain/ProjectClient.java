@@ -18,12 +18,17 @@
  */
 package ch.simas.jtoggl.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Simon Martinelli
  */
 @XmlRootElement(name = "client")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements IData<ProjectClient>, Cloneable {
 
     private Long id;

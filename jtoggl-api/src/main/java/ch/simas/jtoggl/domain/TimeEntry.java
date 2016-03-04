@@ -18,8 +18,11 @@
  */
 package ch.simas.jtoggl.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.xml.bind.annotation.XmlRootElement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,17 +31,21 @@ import java.util.List;
  * @author Simon Martinelli
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<TimeEntry>, Cloneable {
 
     private Long id;
     private String description;
     private Project project;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     private Date start;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     private Date stop;
     private long duration;
     private Boolean billable;
     private Workspace workspace;
-    private List<String> tag_names = new ArrayList<String>();
+    private List<String> tag_names ;//= new ArrayList<String>();
     private String created_with;
     private Boolean duronly;
     private Long pid;

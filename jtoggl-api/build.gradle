@@ -2,14 +2,14 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 
-version = '2.0.0-SNAPSHOT'
+version = '2.0.1-SNAPSHOT'
 group = 'ch.simas.jtoggl'
 
 Properties buildProps = new Properties()
 buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
 
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 buildscript {
 	repositories {
@@ -146,7 +146,8 @@ uploadArchives {
 dependencies {
 
 	compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
-    compile 'org.glassfish.jersey.media:jersey-media-moxy:2.22.2'
+    //compile 'org.glassfish.jersey.media:jersey-media-moxy:2.22.2'
+    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.22.2'
 	compile 'javax.xml.bind:jaxb-api:2.2.12'
 	compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 

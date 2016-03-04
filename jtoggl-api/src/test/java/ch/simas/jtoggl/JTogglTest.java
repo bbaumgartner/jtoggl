@@ -285,7 +285,7 @@ public class JTogglTest {
     private static TimeEntry createTimeEntry() throws Exception {
         TimeEntry entry = new TimeEntry();
         entry.setDuration(480);
-        entry.setBillable(true);
+        //entry.setBillable(true);
         Calendar cal = Calendar.getInstance();
         cal.set(2011, 10, 15, 8, 0);
         entry.setStart(cal.getTime());
