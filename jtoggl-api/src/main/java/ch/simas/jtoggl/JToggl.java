@@ -18,30 +18,40 @@
  */
 package ch.simas.jtoggl;
 
+import ch.simas.jtoggl.domain.Project;
+import ch.simas.jtoggl.domain.ProjectClient;
+import ch.simas.jtoggl.domain.ProjectUser;
+import ch.simas.jtoggl.domain.Task;
+import ch.simas.jtoggl.domain.TimeEntry;
+import ch.simas.jtoggl.domain.User;
+import ch.simas.jtoggl.domain.Workspace;
+import ch.simas.jtoggl.domain.request.RequestClient;
+import ch.simas.jtoggl.domain.request.RequestProject;
+import ch.simas.jtoggl.domain.request.RequestTimeEntry;
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
-import org.eclipse.persistence.jaxb.rs.MOXyJsonProvider;
+import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
 
-import javax.json.JsonObject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ContextResolver;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * API Class for Toggl REST API.
@@ -131,24 +141,13 @@ public class JToggl {
      * @return list of {@link TimeEntry}
      */
     public List<TimeEntry> getTimeEntries(Date startDate, Date endDate) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(TIME_ENTRIES);
 
-        if (startDate != null && endDate != null) {
-            webResource = webResource.queryParam("start_date", DateUtil.convertDateToString(startDate));
-            webResource = webResource.queryParam("end_date", DateUtil.convertDateToString(endDate));
-        }
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<TimeEntry> entries = new ArrayList<TimeEntry>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                entries.add(new TimeEntry(entryObject.toJSONString()));
-            }
-        }
-        return entries;
+        return prepareRequest(TIME_ENTRIES,
+                (startDate != null && endDate != null) ? ImmutableMap.of(
+                        "start_date", DateUtil.convertDateToString(startDate),
+                        "end_date", DateUtil.convertDateToString(endDate))
+                        : null).get(new GenericType<List<TimeEntry>>() {
+        });
     }
 
     /**
@@ -158,19 +157,9 @@ public class JToggl {
      * @return TimeEntry or null if no Entry is found.
      */
     public TimeEntry getTimeEntry(Long id) {
-        Client client = prepareClient();
-        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebTarget webResource = client.target(url);
 
-        String response = null;
-        response = webResource.request().get(String.class);
-
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        if (data == null)
-            return null;
-
-        return new TimeEntry(data.toJSONString());
+        return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString()))
+                .get(TimeEntry.class).getData();
     }
 
     /**
@@ -179,18 +168,9 @@ public class JToggl {
      * @return The running time entry or null if none
      */
     public TimeEntry getCurrentTimeEntry() {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(TIME_ENTRY_CURRENT);
 
-        String response = null;
-        response = webResource.request().get(String.class);
-
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        if (data == null)
-            return null;
-
-        return new TimeEntry(data.toJSONString());
+        return prepareRequest(TIME_ENTRY_CURRENT)
+                .get(TimeEntry.class).getData();
     }
 
     /**
@@ -200,16 +180,8 @@ public class JToggl {
      * @return created {@link TimeEntry}
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(TIME_ENTRIES);
-
-        JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.request().post(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new TimeEntry(data.toJSONString());
+        return prepareRequest(TIME_ENTRIES)
+                .post(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
     }
 
     /**
@@ -219,16 +191,13 @@ public class JToggl {
      * @return created {@link TimeEntry}
      */
     public TimeEntry startTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(TIME_ENTRY_START);
 
-        JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.request().post(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
+        RequestTimeEntry entity = new RequestTimeEntry(timeEntry);
 
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new TimeEntry(data.toJSONString());
+        Response r = prepareRequest(TIME_ENTRY_START)
+                .post(Entity.json(entity));
+        return prepareRequest(TIME_ENTRY_START)
+                .post(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
     }
 
     /**
@@ -238,17 +207,9 @@ public class JToggl {
      * @return the stopped {@link TimeEntry}
      */
     public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        String url = TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString());
-        WebTarget webResource = client.target(url);
 
-        JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.request().put(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new TimeEntry(data.toJSONString());
+        return prepareRequest(TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString()))
+                .put(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
     }
 
     /**
@@ -258,17 +219,9 @@ public class JToggl {
      * @return created {@link TimeEntry}
      */
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString());
-        WebTarget webResource = client.target(url);
 
-        JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.request().put(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new TimeEntry(data.toJSONString());
+        return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString()))
+                .put(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
     }
 
     /**
@@ -277,11 +230,9 @@ public class JToggl {
      * @param id
      */
     public void destroyTimeEntry(Long id) {
-        Client client = prepareClient();
-        String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebTarget webResource = client.target(url);
 
-        webResource.request().delete(String.class);
+        prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString()))
+                .delete();
     }
 
     /**
@@ -290,10 +241,8 @@ public class JToggl {
      * @param id
      */
     public void destroyProject(Long id) {
-        Client client = prepareClient();
-        String url = PROJECT_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebTarget webResource = client.target(url);
-        webResource.request().delete(String.class);
+        prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, id.toString()))
+                .delete();
     }
 
 
@@ -304,72 +253,51 @@ public class JToggl {
      */
     public List<Workspace> getWorkspaces() {
 
-        return prepareClient()
-                .target(WORKSPACES)
-                .request(MediaType.APPLICATION_JSON_TYPE)
+        Invocation.Builder request = prepareRequest(WORKSPACES);
+        Response response = request.get();
+        List<Workspace> workspaces = response.readEntity(new GenericType<List<Workspace>>() {
+        });
+        /*List<Workspace> workspaces = request
                 .get(new GenericType<List<Workspace>>() {
                 });
+                */
+        return workspaces;
     }
 
     /**
      * Get clients.
      *
-     * @return list of {@link ch.simas.jtoggl.Client}
+     * @return list of {@link ProjectClient}
      */
-    public List<ch.simas.jtoggl.Client> getClients() {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(CLIENTS);
+    public List<ProjectClient> getClients() {
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
-            }
-        }
-        return clients;
+        return prepareRequest(CLIENTS)
+                .get(new GenericType<List<ProjectClient>>() {
+                });
     }
 
     /**
      * Create a new client.
      *
      * @param clientObject
-     * @return created {@link ch.simas.jtoggl.Client}
+     * @return created {@link ProjectClient}
      */
-    public ch.simas.jtoggl.Client createClient(ch.simas.jtoggl.Client clientObject) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(CLIENTS);
+    public ProjectClient createClient(final ProjectClient clientObject) {
 
-        JSONObject object = createClientRequestParameter(clientObject);
-        String response = webResource.request().post(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new ch.simas.jtoggl.Client(data.toJSONString());
+        return prepareRequest(CLIENTS)
+                .post(Entity.json(new RequestClient(clientObject)), ProjectClient.class).getData();
     }
 
     /**
      * Update a client.
      *
      * @param clientObject
-     * @return updated {@link ch.simas.jtoggl.Client}
+     * @return updated {@link ProjectClient}
      */
-    public ch.simas.jtoggl.Client updateClient(ch.simas.jtoggl.Client clientObject) {
-        Client client = prepareClient();
-        String url = CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString());
-        WebTarget webResource = client.target(url);
+    public ProjectClient updateClient(ProjectClient clientObject) {
 
-        JSONObject object = createClientRequestParameter(clientObject);
-        String response = webResource.request().put(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new ch.simas.jtoggl.Client(data.toJSONString());
+        return prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString()))
+                .put(Entity.json(new RequestClient(clientObject)), ProjectClient.class).getData();
     }
 
     /**
@@ -378,11 +306,9 @@ public class JToggl {
      * @param id
      */
     public void destroyClient(Long id) {
-        Client client = prepareClient();
-        String url = CLIENT_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebTarget webResource = client.target(url);
 
-        webResource.request().delete(String.class);
+        prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, id.toString()))
+                .delete(String.class);
     }
 
     /**
@@ -412,16 +338,8 @@ public class JToggl {
      * @return created {@link Project}
      */
     public Project createProject(Project project) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(PROJECTS);
 
-        JSONObject object = createProjectRequestParameter(project);
-        String response = webResource.request().post(Entity.entity(object.toJSONString(),
-                MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new Project(data.toJSONString());
+        return prepareRequest(PROJECTS).post(Entity.json(new RequestProject(project)), Project.class).getData();
     }
 
     /**
@@ -431,17 +349,9 @@ public class JToggl {
      * @return updated {@link Project}
      */
     public Project updateProject(Project project) {
-        Client client = prepareClient();
-        String url = PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString());
-        WebTarget webResource = client.target(url);
 
-        JSONObject object = createProjectRequestParameter(project);
-        String response = webResource.request().put(Entity.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new Project(data.toJSONString());
+        return prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString()))
+                .put(Entity.json(new RequestProject(project)), Project.class).getData();
     }
 
     /**
@@ -451,16 +361,9 @@ public class JToggl {
      * @return created {@link ProjectUser}
      */
     public ProjectUser createProjectUser(ProjectUser projectUser) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(PROJECT_USERS);
 
-        JSONObject object = createProjectUserRequestParameter(projectUser);
-        String response = webResource.request().post(Entity.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new ProjectUser(data.toJSONString());
+        return prepareRequest(PROJECT_USERS)
+                .post(Entity.json(projectUser), ProjectUser.class).getData();
     }
 
     /**
@@ -488,16 +391,9 @@ public class JToggl {
      * @return created {@link Task}
      */
     public Task createTask(Task task) {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(TASKS);
 
-        JSONObject object = createTaskRequestParameter(task);
-        String response = webResource.request().post(Entity.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new Task(data.toJSONString());
+        return prepareRequest(TASKS)
+                .post(Entity.json(task), Task.class).getData();
     }
 
     /**
@@ -507,17 +403,9 @@ public class JToggl {
      * @return updated {@link Task}
      */
     public Task updateTask(Task task) {
-        Client client = prepareClient();
-        String url = TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString());
-        WebTarget webResource = client.target(url);
 
-        JSONObject object = createTaskRequestParameter(task);
-        String response = webResource.request().put(Entity.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE), String.class);
-
-        object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-        return new Task(data.toJSONString());
+        return prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString()))
+                .put(Entity.json(task), Task.class).getData();
     }
 
     /**
@@ -526,11 +414,9 @@ public class JToggl {
      * @param id
      */
     public void destroyTask(Long id) {
-        Client client = prepareClient();
-        String url = TASK_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebTarget webResource = client.target(url);
 
-        webResource.request().delete(String.class);
+        prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, id.toString()))
+                .delete();
     }
 
     /**
@@ -539,13 +425,8 @@ public class JToggl {
      * @return current user {@link User}
      */
     public User getCurrentUser() {
-
-        Data<User> response = prepareClient()
-                .target(GET_CURRENT_USER)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get(new GenericType<Data<User>>() {
-                });
-        return response.getData();
+        return prepareRequest(GET_CURRENT_USER)
+                .get(User.class).getData();
     }
 
     /**
@@ -566,21 +447,10 @@ public class JToggl {
      * @return all users
      */
     public List<User> getWorkspaceUsers(long workspaceId) {
-        Client client = prepareClient();
-        String url = WORKSPACE_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-        WebTarget webResource = client.target(url);
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<User> users = new ArrayList<User>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                users.add(new User(entryObject.toJSONString()));
-            }
-        }
-        return users;
+        return prepareRequest(WORKSPACE_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId)))
+                .get(new GenericType<List<User>>() {
+                });
     }
 
     /**
@@ -590,21 +460,10 @@ public class JToggl {
      * @return all projects
      */
     public List<Project> getWorkspaceProjects(long workspaceId) {
-        Client client = prepareClient();
-        String url = WORKSPACE_PROJECTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-        WebTarget webResource = client.target(url);
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<Project> projects = new ArrayList<Project>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                projects.add(new Project(entryObject.toJSONString()));
-            }
-        }
-        return projects;
+        return prepareRequest(WORKSPACE_PROJECTS.replace(PLACEHOLDER, String.valueOf(workspaceId)))
+                .get(new GenericType<List<Project>>() {
+                });
     }
 
     /**
@@ -613,22 +472,11 @@ public class JToggl {
      * @param workspaceId id of the workspace
      * @return all clients
      */
-    public List<ch.simas.jtoggl.Client> getWorkspaceClients(long workspaceId) {
-        Client client = prepareClient();
-        String url = WORKSPACE_CLIENTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-        WebTarget webResource = client.target(url);
+    public List<ProjectClient> getWorkspaceClients(long workspaceId) {
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                clients.add(new ch.simas.jtoggl.Client(entryObject.toJSONString()));
-            }
-        }
-        return clients;
+        return prepareRequest(WORKSPACE_CLIENTS.replace(PLACEHOLDER, String.valueOf(workspaceId)))
+                .get(new GenericType<List<ProjectClient>>() {
+                });
     }
 
     /**
@@ -638,21 +486,10 @@ public class JToggl {
      * @return all tasks
      */
     public List<Task> getActiveWorkspaceTasks(long workspaceId) {
-        Client client = prepareClient();
-        String url = WORKSPACE_TASKS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-        WebTarget webResource = client.target(url);
 
-        String response = webResource.request().get(String.class);
-        JSONArray data = (JSONArray) JSONValue.parse(response);
-
-        List<Task> tasks = new ArrayList<Task>();
-        if (data != null) {
-            for (Object obj : data) {
-                JSONObject entryObject = (JSONObject) obj;
-                tasks.add(new Task(entryObject.toJSONString()));
-            }
-        }
-        return tasks;
+        return prepareRequest(WORKSPACE_TASKS.replace(PLACEHOLDER, String.valueOf(workspaceId)))
+                .get(new GenericType<List<Task>>() {
+                });
     }
 
     /**
@@ -688,6 +525,7 @@ public class JToggl {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
+        clientConfig.register(createMoxyJsonResolver());
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
@@ -701,35 +539,12 @@ public class JToggl {
         return client;
     }
 
-
-    private JSONObject createTimeEntryRequestParameter(TimeEntry timeEntry) {
-        JSONObject object = new JSONObject();
-        object.put("time_entry", timeEntry.toJSONObject());
-        return object;
-    }
-
-    private JSONObject createClientRequestParameter(ch.simas.jtoggl.Client client) {
-        JSONObject object = new JSONObject();
-        object.put("client", client.toJSONObject());
-        return object;
-    }
-
-    private JSONObject createProjectRequestParameter(Project project) {
-        JSONObject object = new JSONObject();
-        object.put("project", project.toJSONObject());
-        return object;
-    }
-
-    private JSONObject createProjectUserRequestParameter(ProjectUser projectUser) {
-        JSONObject object = new JSONObject();
-        object.put("project_user", projectUser.toJSONObject());
-        return object;
-    }
-
-    private JSONObject createTaskRequestParameter(Task task) {
-        JSONObject object = new JSONObject();
-        object.put("task", task.toJSONObject());
-        return object;
+    public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
+        final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
+        Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
+        namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+        moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
+        return moxyJsonConfig.resolver();
     }
 
     public long getThrottlePeriod() {
@@ -738,6 +553,21 @@ public class JToggl {
 
     public void setThrottlePeriod(long throttlePeriod) {
         this.throttlePeriod = throttlePeriod;
+    }
+
+    private Invocation.Builder prepareRequest(String url, Map<String, String> params) {
+
+        WebTarget target = prepareClient().target(url);
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                target = target.queryParam(entry.getKey(), entry.getValue());
+            }
+        }
+        return target.request(MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    private Invocation.Builder prepareRequest(String url) {
+        return prepareRequest(url, null);
     }
 
 }

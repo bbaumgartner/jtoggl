@@ -16,13 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.simas.jtoggl;
+package ch.simas.jtoggl.domain;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -30,8 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Simon Martinelli
  */
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class User extends Data<User> {
+public class User extends AbstractDataWrapper<User> implements IData<User> {
 
     private Long id;
     private String jquery_timeofday_format;
@@ -49,24 +44,6 @@ public class User extends Data<User> {
     private Boolean storeStartAndStopTime;
 
     public User() {
-    }
-
-    public User(String jsonString) {
-        JSONObject object = (JSONObject) JSONValue.parse(jsonString);
-        this.id = (Long) object.get("id");
-        this.jquery_timeofday_format = (String) object.get("jquery_timeofday_format");
-        this.api_token = (String) object.get("api_token");
-        this.time_entry_retention_days = (Long) object.get("retention");
-        this.jquery_date_format = (String) object.get("jquery_date_format");
-        this.date_format = (String) object.get("date_format");
-        this.default_workspace_id = (Long) object.get("default_wid");
-        this.fullname = (String) object.get("fullname");
-        this.language = (String) object.get("language");
-        this.beginning_of_week = (Long) object.get("beginning_of_week");
-        this.timeofday_format = (String) object.get("timeofday_format");
-        this.email = (String) object.get("email");
-        this.timeZone = (String) object.get("timezone");
-        this.storeStartAndStopTime = (Boolean) object.get("store_start_and_stop_time");
     }
 
     public String getApi_token() {
@@ -177,10 +154,13 @@ public class User extends Data<User> {
         this.storeStartAndStopTime = storeStartAndStopTime;
     }
 
-
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" + api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" + jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" + default_workspace_id + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" + beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
+        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" +
+                api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" +
+                jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" +
+                default_workspace_id + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" +
+                beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
     }
 
     @Override
@@ -203,5 +183,15 @@ public class User extends Data<User> {
         int hash = 5;
         hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public User getData() {
+        return super.getData();
+    }
+
+    @Override
+    public void setData(User data) {
+        super.setData(data);
     }
 }

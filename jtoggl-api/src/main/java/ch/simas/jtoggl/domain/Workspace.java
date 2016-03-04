@@ -1,4 +1,3 @@
-
 /*
  * jtoggl - Java Wrapper for Toggl REST API https://www.toggl.com/public/api
  *
@@ -17,35 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.simas.jtoggl;
+package ch.simas.jtoggl.domain;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * 
  * @author Simon Martinelli
  */
-public class Tag {
+@XmlRootElement
+public class Workspace extends AbstractDataWrapper<Workspace> implements IData<Workspace> {
 
     private Long id;
     private String name;
-    private Workspace workspace;
+    private Boolean premium;
 
-    public Tag() {
-    }
-
-    public Tag(String jsonString) {
-        JSONObject object = (JSONObject) JSONValue.parse(jsonString);
-        this.id = (Long) object.get("id");
-        this.name = (String) object.get("name");
-
-        JSONObject workspaceObject = (JSONObject) object.get("workspace");
-        if (workspaceObject != null) {
-            this.workspace = new Workspace(workspaceObject.toJSONString());
-        }
+    public Workspace() {
     }
 
     public Long getId() {
@@ -64,37 +50,17 @@ public class Tag {
         this.name = name;
     }
 
-    public Workspace getWorkspace() {
-        return workspace;
+    public Boolean getPremium() {
+        return premium;
     }
 
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    public JSONObject toJSONObject() {
-        JSONObject object = new JSONObject();
-        if (id != null) {
-            object.put("id", id);
-        }
-        if (name != null) {
-            object.put("name", name);
-        }
-
-        if (workspace != null) {
-            object.put("workspace", this.workspace.toJSONObject());
-        }
-
-        return object;
-    }
-
-    public String toJSONString() {
-        return this.toJSONObject().toJSONString();
+    public void setPremium(Boolean premium) {
+        this.premium = premium;
     }
 
     @Override
     public String toString() {
-        return "Tag{" + "id=" + id + ", name=" + name + ", workspace=" + workspace + '}';
+        return "Workspace{" + "id=" + id + ", name=" + name + '}';
     }
 
     @Override
@@ -105,7 +71,7 @@ public class Tag {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Tag other = (Tag) obj;
+        final Workspace other = (Workspace) obj;
         if (this.id != other.id && (this.id == null || !this.id.equals(other.id))) {
             return false;
         }
@@ -115,7 +81,18 @@ public class Tag {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
+        hash = 83 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
     }
+
+    @Override
+    public Workspace getData() {
+        return super.getData();
+    }
+
+    @Override
+    public void setData(Workspace data) {
+        super.setData(data);
+    }
+
 }

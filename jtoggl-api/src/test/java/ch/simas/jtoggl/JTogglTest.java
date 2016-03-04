@@ -18,17 +18,23 @@
  */
 package ch.simas.jtoggl;
 
-import static org.junit.Assert.assertTrue;
+import ch.simas.jtoggl.domain.Project;
+import ch.simas.jtoggl.domain.ProjectClient;
+import ch.simas.jtoggl.domain.Task;
+import ch.simas.jtoggl.domain.TimeEntry;
+import ch.simas.jtoggl.domain.User;
+import ch.simas.jtoggl.domain.Workspace;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Simon Martinelli
@@ -37,7 +43,7 @@ public class JTogglTest {
 
     private static JToggl jToggl;
     private static TimeEntry timeEntry;
-    private static Client client;
+    private static ProjectClient client;
     private static Project project;
     private static Task task;
     private static Workspace workspace;
@@ -65,7 +71,7 @@ public class JTogglTest {
             if (togglPassword == null) {
                 throw new RuntimeException("TOGGL_PASSWORD not set.");
             }
-            togglPassword=Base64.getEncoder().encodeToString(togglPassword.getBytes());
+            togglPassword = Base64.getEncoder().encodeToString(togglPassword.getBytes());
             togglApiToken = new JToggl(togglUsername, togglPassword).getCurrentUser().getApi_token();
         }
         if (togglApiToken == null) {
@@ -178,7 +184,7 @@ public class JTogglTest {
             TimeEntry stoppedTe = jToggl.stopTimeEntry(te);
 
             Assert.assertEquals(te.getId(), stoppedTe.getId());
-            Assert.assertTrue(stoppedTe.toJSONString(), stoppedTe.getDuration() > 1); //stopped
+            Assert.assertTrue(stoppedTe.toString(), stoppedTe.getDuration() > 1); //stopped
 
             current = jToggl.getCurrentTimeEntry();
             Assert.assertNull(current);
@@ -196,7 +202,7 @@ public class JTogglTest {
 
     @Test
     public void getClients() {
-        List<Client> clients = jToggl.getClients();
+        List<ProjectClient> clients = jToggl.getClients();
 
         Assert.assertFalse(clients.isEmpty());
     }
@@ -205,7 +211,7 @@ public class JTogglTest {
     public void updateClient() {
 
         client.setNotes("Making more notes for update! " + new Date());
-        Client cl = jToggl.updateClient(client);
+        ProjectClient cl = jToggl.updateClient(client);
 
         Assert.assertNotNull(cl);
         Assert.assertEquals(client.getNotes(), cl.getNotes());
@@ -294,8 +300,8 @@ public class JTogglTest {
         return entry;
     }
 
-    private static Client createClient() {
-        Client cl = new Client();
+    private static ProjectClient createClient() {
+        ProjectClient cl = new ProjectClient();
         cl.setName("JUnit Client");
         cl.setWorkspace(workspace);
 
