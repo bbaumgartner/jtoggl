@@ -21,14 +21,17 @@ package ch.simas.jtoggl;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 /**
- * 
  * @author Simon Martinelli
  */
-@XmlRootElement(name="data")
-public class User extends Data {
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class User extends Data<User> {
 
     private Long id;
     private String jquery_timeofday_format;
@@ -43,7 +46,7 @@ public class User extends Data {
     private String timeofday_format;
     private String email;
     private String timeZone;
-	private Boolean storeStartAndStopTime;
+    private Boolean storeStartAndStopTime;
 
     public User() {
     }
@@ -62,8 +65,8 @@ public class User extends Data {
         this.beginning_of_week = (Long) object.get("beginning_of_week");
         this.timeofday_format = (String) object.get("timeofday_format");
         this.email = (String) object.get("email");
-        this.timeZone= (String) object.get("timezone");
-        this.storeStartAndStopTime= (Boolean) object.get("store_start_and_stop_time");
+        this.timeZone = (String) object.get("timezone");
+        this.storeStartAndStopTime = (Boolean) object.get("store_start_and_stop_time");
     }
 
     public String getApi_token() {
@@ -157,71 +160,23 @@ public class User extends Data {
     public String getTimeofday_format() {
         return timeofday_format;
     }
-    
+
     public String getTimeZone() {
-		return timeZone;
-	}
+        return timeZone;
+    }
 
     public void setTimeofday_format(String timeofday_format) {
         this.timeofday_format = timeofday_format;
     }
-    
+
     public Boolean getStoreStartAndStopTime() {
-		return storeStartAndStopTime;
-	}
-    
+        return storeStartAndStopTime;
+    }
+
     public void setStoreStartAndStopTime(Boolean storeStartAndStopTime) {
-		this.storeStartAndStopTime = storeStartAndStopTime;
-	}
-
-    public JSONObject toJSONObject() {
-        JSONObject object = new JSONObject();
-        if (id != null) {
-            object.put("id", id);
-        }
-        if (jquery_timeofday_format != null) {
-            object.put("jquery_timeofday_format", jquery_timeofday_format);
-        }
-        if (api_token != null) {
-            object.put("api_token", api_token);
-        }
-        if (time_entry_retention_days != null) {
-            object.put("retention", time_entry_retention_days);
-        }
-        if (jquery_date_format != null) {
-            object.put("jquery_date_format", jquery_date_format);
-        }
-        if (date_format != null) {
-            object.put("date_format", date_format);
-        }
-        if (default_workspace_id != null) {
-            object.put("default_wid", default_workspace_id);
-        }
-        if (fullname != null) {
-            object.put("fullname", fullname);
-        }
-        if (language != null) {
-            object.put("language", language);
-        }
-        if (beginning_of_week != null) {
-            object.put("beginning_of_week", beginning_of_week);
-        }
-        if (timeofday_format != null) {
-            object.put("timeofday_format", timeofday_format);
-        }
-        if (email != null) {
-            object.put("email", email);
-        }
-        if (storeStartAndStopTime != null) {
-        	object.put("store_start_and_stop_time", storeStartAndStopTime);
-        }
-
-        return object;
+        this.storeStartAndStopTime = storeStartAndStopTime;
     }
 
-    public String toJSONString() {
-        return this.toJSONObject().toJSONString();
-    }
 
     @Override
     public String toString() {

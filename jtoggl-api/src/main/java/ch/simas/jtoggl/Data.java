@@ -1,17 +1,22 @@
 package ch.simas.jtoggl;
 
-import javax.ws.rs.client.Entity;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created by hpa on 3.3.16.
+ * Created by hpa on 4.3.16.
  */
 @XmlRootElement
-public class Data {
-    private Entity data;
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Data<T> {
+    private T data;
 
-    public Object getData() {
-        return this;
+    public T getData() {
+        return data;
     }
 
+    public void setData(T data) {
+        this.data = data;
+    }
 }

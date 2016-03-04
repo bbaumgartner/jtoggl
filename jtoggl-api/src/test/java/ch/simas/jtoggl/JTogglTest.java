@@ -73,6 +73,7 @@ public class JTogglTest {
         }
         jToggl = new JToggl(togglApiToken, "api_token");
 
+        User cu = jToggl.getCurrentUser();
 
         jToggl.setThrottlePeriod(500l);
         jToggl.switchLoggingOn();

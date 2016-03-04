@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Simon Martinelli
  */
-@XmlRootElement
 public class Project {
 
     private Long id;

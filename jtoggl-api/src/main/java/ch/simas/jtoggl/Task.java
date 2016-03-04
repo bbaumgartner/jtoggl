@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Simon Martinelli
  */
-@XmlRootElement
 public class Task {
 
     private Long id;
@@ -140,10 +139,6 @@ public class Task {
         if (project != null) {
             object.put("project", this.project.toJSONObject());
             object.put("pid", this.project.getId());
-        }
-        if (user != null) {
-            object.put("user", this.user.toJSONObject());
-            object.put("uid", this.user.getId());
         }
 
         return object;

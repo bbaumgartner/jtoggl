@@ -27,7 +27,6 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  * @author Simon Martinelli
  */
-@XmlRootElement
 public class ProjectUser {
 
     private Long id;
@@ -108,9 +107,6 @@ public class ProjectUser {
         }
         if (project != null) {
             object.put("project", this.project.toJSONObject());
-        }
-        if (user != null) {
-            object.put("user", this.user.toJSONObject());
         }
 
         return object;

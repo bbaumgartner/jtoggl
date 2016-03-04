@@ -304,10 +304,11 @@ public class JToggl {
      */
     public List<Workspace> getWorkspaces() {
 
-       return  prepareClient()
+        return prepareClient()
                 .target(WORKSPACES)
                 .request(MediaType.APPLICATION_JSON_TYPE)
-                .get(new GenericType<List<Workspace>>() {});
+                .get(new GenericType<List<Workspace>>() {
+                });
     }
 
     /**
@@ -538,14 +539,13 @@ public class JToggl {
      * @return current user {@link User}
      */
     public User getCurrentUser() {
-        Client client = prepareClient();
-        WebTarget webResource = client.target(GET_CURRENT_USER);
 
-        String response = webResource.request().get(String.class);
-        JSONObject object = (JSONObject) JSONValue.parse(response);
-        JSONObject data = (JSONObject) object.get(DATA);
-
-        return new User(data.toJSONString());
+        Data<User> response = prepareClient()
+                .target(GET_CURRENT_USER)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get(new GenericType<Data<User>>() {
+                });
+        return response.getData();
     }
 
     /**
