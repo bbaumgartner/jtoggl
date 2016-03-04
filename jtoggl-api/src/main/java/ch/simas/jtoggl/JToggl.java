@@ -33,6 +33,9 @@ import ch.simas.jtoggl.domain.request.RequestTimeEntry;
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
+import org.glassfish.hk2.api.Descriptor;
+import org.glassfish.hk2.api.Filter;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -44,9 +47,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import javax.ws.rs.ext.ContextResolver;
 import java.util.ArrayList;
 import java.util.Date;
@@ -572,4 +573,26 @@ public class JToggl {
         return prepareRequest(url, null);
     }
 
+    public static class AndroidFriendlyFeature implements Feature {
+
+        @Override
+        public boolean configure(FeatureContext context) {
+            context.register(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    addUnbindFilter(new Filter() {
+                        @Override
+                        public boolean matches(Descriptor d) {
+                            String implClass = d.getImplementation();
+                            return implClass.startsWith(
+                                    "org.glassfish.jersey.message.internal.DataSource")
+                                    || implClass.startsWith(
+                                    "org.glassfish.jersey.message.internal.RenderedImage");
+                        }
+                    });
+                }
+            });
+            return true;
+        }
+    }
 }
