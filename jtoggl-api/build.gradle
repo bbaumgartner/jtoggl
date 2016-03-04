@@ -8,8 +8,8 @@ group = 'ch.simas.jtoggl'
 Properties buildProps = new Properties()
 buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.5
+targetCompatibility = 1.5
 
 buildscript {
 	repositories {
