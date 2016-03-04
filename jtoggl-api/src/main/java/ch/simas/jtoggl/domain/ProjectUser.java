@@ -31,6 +31,8 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
     private Boolean manager;
     private Project project;
     private User user;
+    private Long pid;
+    private Long uid;
 
     public ProjectUser() {
     }
@@ -113,5 +115,35 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
     @Override
     public void setData(ProjectUser data) {
         super.setData(data);
+    }
+
+    public Long getPid() {
+        return pid;
+    }
+
+    public void setPid(Long pid) {
+        this.pid = pid;
+    }
+
+    public Long getUid() {
+        return uid;
+    }
+
+    public void setUid(Long uid) {
+        this.uid = uid;
+    }
+
+    @Override
+    public ProjectUser clone() {
+        ProjectUser pu = new ProjectUser();
+        pu.id = id;
+        pu.hourly_rate = hourly_rate;
+        pu.manager = manager;
+        pu.project = project;
+        pu.user = user;
+        pu.pid = pid;
+        pu.uid = uid;
+        return pu;
+
     }
 }

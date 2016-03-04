@@ -19,6 +19,7 @@
 package ch.simas.jtoggl.domain;
 
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -34,13 +35,15 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
     private Long time_entry_retention_days;
     private String jquery_date_format;
     private String date_format;
+    @XmlElement(name="default_wid")
     private Long default_workspace_id;
     private String fullname;
     private String language;
     private Long beginning_of_week;
     private String timeofday_format;
     private String email;
-    private String timeZone;
+    @XmlElement(name="timezone")
+    private String timezone;
     private Boolean storeStartAndStopTime;
 
     public User() {
@@ -138,8 +141,8 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
         return timeofday_format;
     }
 
-    public String getTimeZone() {
-        return timeZone;
+    public String getTimezone() {
+        return timezone;
     }
 
     public void setTimeofday_format(String timeofday_format) {

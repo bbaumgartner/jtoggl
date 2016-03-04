@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Simon Martinelli
  */
 @XmlRootElement
-public class Task extends AbstractDataWrapper<Task> implements IData<Task> {
+public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Cloneable {
 
     private Long id;
     private String name;
@@ -34,6 +34,7 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task> {
     private Workspace workspace;
     private Project project;
     private User user;
+    private Long pid;
 
     public Task() {
     }
@@ -131,5 +132,26 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task> {
     @Override
     public void setData(Task data) {
         super.setData(data);
+    }
+
+    @Override
+    public Task clone() {
+        Task tk = new Task();
+        tk.id = id;
+        tk.name = name;
+        tk.estimated_seconds = estimated_seconds;
+        tk.is_active = is_active;
+        tk.workspace = workspace;
+        tk.project = project;
+        tk.user = user;
+        return tk;
+    }
+
+    public Long getPid() {
+        return pid;
+    }
+
+    public void setPid(Long pid) {
+        this.pid = pid;
     }
 }

@@ -27,6 +27,8 @@ import ch.simas.jtoggl.domain.User;
 import ch.simas.jtoggl.domain.Workspace;
 import ch.simas.jtoggl.domain.request.RequestClient;
 import ch.simas.jtoggl.domain.request.RequestProject;
+import ch.simas.jtoggl.domain.request.RequestProjectUser;
+import ch.simas.jtoggl.domain.request.RequestTask;
 import ch.simas.jtoggl.domain.request.RequestTimeEntry;
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
@@ -363,7 +365,7 @@ public class JToggl {
     public ProjectUser createProjectUser(ProjectUser projectUser) {
 
         return prepareRequest(PROJECT_USERS)
-                .post(Entity.json(projectUser), ProjectUser.class).getData();
+                .post(Entity.json(new RequestProjectUser(projectUser)), ProjectUser.class).getData();
     }
 
     /**
@@ -393,7 +395,7 @@ public class JToggl {
     public Task createTask(Task task) {
 
         return prepareRequest(TASKS)
-                .post(Entity.json(task), Task.class).getData();
+                .post(Entity.json(new RequestTask(task)), Task.class).getData();
     }
 
     /**
@@ -405,7 +407,7 @@ public class JToggl {
     public Task updateTask(Task task) {
 
         return prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString()))
-                .put(Entity.json(task), Task.class).getData();
+                .put(Entity.json(new RequestTask(task)), Task.class).getData();
     }
 
     /**

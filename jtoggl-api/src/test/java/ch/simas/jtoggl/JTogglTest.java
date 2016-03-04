@@ -271,8 +271,8 @@ public class JTogglTest {
         User user = jToggl.getCurrentUser();
 
         Assert.assertNotNull(user);
-        Assert.assertNotNull(user.getTimeZone());
-        Assert.assertTrue(!user.getTimeZone().isEmpty());
+        Assert.assertNotNull(user.getTimezone());
+        Assert.assertTrue(!user.getTimezone().isEmpty());
     }
 
     @Test
