@@ -691,7 +691,6 @@ public class JToggl {
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
-       // client.register(new MoxyJsonFeature());
         if (log) {
             LoggingFilter loggingFilter = new LoggingFilter();
             client.register(loggingFilter);
