@@ -523,11 +523,11 @@ public class JToggl {
         this.log = false;
     }
 
-    private Client prepareClient() {
+    protected Client prepareClient() {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
-        clientConfig.register(createMoxyJsonResolver());
+        //clientConfig.register(createMoxyJsonResolver());
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
@@ -540,7 +540,7 @@ public class JToggl {
         }
         return client;
     }
-
+/*
     public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
         final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
         Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
@@ -548,7 +548,7 @@ public class JToggl {
         moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
         return moxyJsonConfig.resolver();
     }
-
+*/
     public long getThrottlePeriod() {
         return throttlePeriod;
     }
