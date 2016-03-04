@@ -144,16 +144,13 @@ uploadArchives {
 }
 */
 dependencies {
+
 	compile 'org.glassfish.jersey.core:jersey-client:2.22.2'
     compile 'org.glassfish.jersey.media:jersey-media-moxy:2.22.2'
 	compile 'javax.xml.bind:jaxb-api:2.2.12'
-
-	compile 'com.googlecode.json-simple:json-simple:1.1.1'
 	compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
-    compile 'javax.json:javax.json-api:1.0'
-    compile 'org.json:json:20160212'
-    compile 'org.glassfish:javax.json:1.0.4'
-    testCompile 'commons-codec:commons-codec:1.10'
+
     testCompile 'junit:junit:4.10'
+
 	deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
