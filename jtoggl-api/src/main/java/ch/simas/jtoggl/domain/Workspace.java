@@ -19,12 +19,17 @@
 package ch.simas.jtoggl.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Simon Martinelli
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Workspace extends AbstractDataWrapper<Workspace> implements IData<Workspace> {
 
     private Long id;

@@ -41,7 +41,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.moxy.json.MoxyJsonConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -529,6 +529,7 @@ public class JToggl {
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
         //clientConfig.register(createMoxyJsonResolver());
+        clientConfig.register(JacksonFeature.class);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
         client.register(HttpAuthenticationFeature.basic(user, password));
