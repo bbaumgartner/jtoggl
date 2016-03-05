@@ -48,7 +48,7 @@ public class CustomDateDeserializer extends JsonDeserializer<Calendar> {
             } else {
                 c.set(Calendar.ZONE_OFFSET, 0);
             }
-            c.set(year, month, day, hour, minute, second);
+            c.set(year, month - 1, day, hour, minute, second);
             c.set(Calendar.MILLISECOND, milisecond);
             return c;
         }
