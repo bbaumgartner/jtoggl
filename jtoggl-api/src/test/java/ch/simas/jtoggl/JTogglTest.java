@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -120,8 +121,8 @@ public class JTogglTest {
     @Test
     public void getTimeEntriesWithRange() {
         Calendar cal = Calendar.getInstance();
-        cal.set(2011, 11, 10);
-        List<TimeEntry> entries = jToggl.getTimeEntries(cal.getTime(), cal.getTime());
+        cal.set(2011, 11, 10, 0, 0);
+        List<TimeEntry> entries = jToggl.getTimeEntries(cal, cal);
 
         Assert.assertTrue(entries.isEmpty());
     }
@@ -287,10 +288,12 @@ public class JTogglTest {
         entry.setDuration(480);
         entry.setBillable(true);
         Calendar cal = Calendar.getInstance();
-        cal.set(2011, 10, 15, 8, 0);
-        entry.setStart(cal.getTime());
-        cal.set(2011, 10, 15, 16, 0);
-        entry.setStop(cal.getTime());
+        cal.set(2011, 10, 15, 8, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        entry.setStart(cal);
+        cal.set(2011, 10, 15, 16, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        entry.setStop(cal);
         entry.setDescription("From JUnit Test");
         entry.setCreated_with("JUnit");
 

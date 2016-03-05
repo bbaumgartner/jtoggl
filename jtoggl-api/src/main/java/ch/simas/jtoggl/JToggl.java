@@ -19,18 +19,9 @@
 package ch.simas.jtoggl;
 
 import ch.simas.jtoggl.domain.*;
-import ch.simas.jtoggl.domain.request.RequestClient;
-import ch.simas.jtoggl.domain.request.RequestProject;
-import ch.simas.jtoggl.domain.request.RequestProjectUser;
-import ch.simas.jtoggl.domain.request.RequestTask;
-import ch.simas.jtoggl.domain.request.RequestTimeEntry;
+import ch.simas.jtoggl.domain.request.*;
 import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.hk2.api.Descriptor;
 import org.glassfish.hk2.api.Filter;
@@ -42,24 +33,12 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import static ch.simas.jtoggl.domain.IData.INPUT_DATE_FORMAT;
-import static ch.simas.jtoggl.domain.IData.OUTPUT_DATE_FORMAT;
+import java.util.*;
 
 /**
  * API Class for Toggl REST API.
@@ -148,12 +127,12 @@ public class JToggl {
      * @param endDate
      * @return list of {@link TimeEntry}
      */
-    public List<TimeEntry> getTimeEntries(Date startDate, Date endDate) {
+    public List<TimeEntry> getTimeEntries(Calendar startDate, Calendar endDate) {
 
         return prepareRequest(TIME_ENTRIES,
                 (startDate != null && endDate != null) ? ImmutableMap.of(
-                        "start_date", DateUtil.convertDateToString(startDate),
-                        "end_date", DateUtil.convertDateToString(endDate))
+                        "start_date", DateUtil.formatDate(startDate),
+                        "end_date", DateUtil.formatDate(endDate))
                         : null).get(new GenericType<List<TimeEntry>>() {
         });
     }
@@ -533,8 +512,7 @@ public class JToggl {
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
         clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
-        //clientConfig.register(createMoxyJsonResolver());
-        clientConfig.register(JacksonConfigurator.class);
+        // clientConfig.register(JacksonConfigurator.class);
         clientConfig.register(JacksonFeature.class);
         Client client =
                 JerseyClientBuilder.createClient(clientConfig);
@@ -549,15 +527,6 @@ public class JToggl {
         return client;
     }
 /*
-    public static ContextResolver<MoxyJsonConfig> createMoxyJsonResolver() {
-        final MoxyJsonConfig moxyJsonConfig = new MoxyJsonConfig();
-        Map<String, String> namespacePrefixMapper = new HashMap<String, String>(1);
-        namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
-        moxyJsonConfig.setNamespacePrefixMapper(namespacePrefixMapper).setNamespaceSeparator(':');
-        return moxyJsonConfig.resolver();
-    }
-*/
-
     @Provider
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -566,10 +535,10 @@ public class JToggl {
         private ObjectMapper mapper = new ObjectMapper();
 
         public JacksonConfigurator() {
-            SerializationConfig serConfig = mapper.getSerializationConfig();
-            serConfig.with(OUTPUT_DATE_FORMAT);
-            DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
-            deserializationConfig.with(INPUT_DATE_FORMAT);
+      //      SerializationConfig serConfig = mapper.getSerializationConfig();
+//            serConfig.with(OUTPUT_DATE_FORMAT);
+    //        DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
+  //          deserializationConfig.with(INPUT_DATE_FORMAT);
             mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         }
 
@@ -578,7 +547,7 @@ public class JToggl {
             return mapper;
         }
 
-    }
+    }*/
 
     public long getThrottlePeriod() {
         return throttlePeriod;

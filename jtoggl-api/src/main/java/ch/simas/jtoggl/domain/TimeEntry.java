@@ -18,16 +18,17 @@
  */
 package ch.simas.jtoggl.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import ch.simas.jtoggl.CustomDateDeserializer;
+import ch.simas.jtoggl.CustomDateSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.ArrayList;
-import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -44,14 +45,14 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
     private Project project;
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    private Date start;
+    private Calendar start;
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    private Date stop;
+    private Calendar stop;
     private long duration;
     private Boolean billable;
     private Workspace workspace;
-    private List<String> tag_names ;//= new ArrayList<String>();
+    private List<String> tag_names;//= new ArrayList<String>();
     private String created_with;
     private Boolean duronly;
     private Long pid;
@@ -112,19 +113,19 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         }
     }
 
-    public Date getStart() {
+    public Calendar getStart() {
         return start;
     }
 
-    public void setStart(Date start) {
+    public void setStart(Calendar start) {
         this.start = start;
     }
 
-    public Date getStop() {
+    public Calendar getStop() {
         return stop;
     }
 
-    public void setStop(Date stop) {
+    public void setStop(Calendar stop) {
         this.stop = stop;
     }
 
@@ -182,8 +183,9 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
 
     @Override
     public String toString() {
+        DateFormat f = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.LONG);
         return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" +
-                start + ", stop=" + stop + ", duration=" + duration + ", billable=" + billable + ", workspace=" +
+                (start == null ? "null" : f.format(start.getTime())) + ", stop=" + (stop == null ? "null" : f.format(stop.getTime())) + ", duration=" + duration + ", billable=" + billable + ", workspace=" +
                 workspace + ", tag_names=" + tag_names + ", duronly=" + duronly + ", tid = " + tid + '}';
     }
 
