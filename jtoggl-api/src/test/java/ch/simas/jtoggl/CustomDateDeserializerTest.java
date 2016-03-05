@@ -22,32 +22,32 @@ public class CustomDateDeserializerTest {
         Calendar c = Calendar.getInstance();
 
         c.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464+01:00"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464Z"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT-1:00"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT+3:00"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464+03"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT-4:30"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-0430"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        c.set(2016, 02, 11, 10, 28, 43);
+        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
         assertFalse("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null)));
 
