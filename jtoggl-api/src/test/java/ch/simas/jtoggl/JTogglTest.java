@@ -115,6 +115,10 @@ public class JTogglTest {
     public void getTimeEntries() {
         List<TimeEntry> entries = jToggl.getTimeEntries();
 
+        for (TimeEntry te : entries) {
+            System.out.println(te);
+        }
+
         Assert.assertFalse(entries.isEmpty());
     }
 

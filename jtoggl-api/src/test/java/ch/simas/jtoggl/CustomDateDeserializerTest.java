@@ -6,7 +6,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.Assert.*;
@@ -16,6 +20,8 @@ import static org.junit.Assert.*;
  */
 public class CustomDateDeserializerTest {
 
+    public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
     @Test
     public void testDeserialize() throws Exception {
         CustomDateDeserializer d = new CustomDateDeserializer();
@@ -24,6 +30,7 @@ public class CustomDateDeserializerTest {
         c.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
         c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
         c.set(Calendar.MILLISECOND, 464);
+        SIMPLE_DATE_FORMAT.parse("2016-02-11T10:28:43.464+0100");
         assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464+01:00"), null)));
 
         c.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
@@ -51,6 +58,23 @@ public class CustomDateDeserializerTest {
         c.set(Calendar.MILLISECOND, 464);
         assertFalse("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null)));
 
+    }
+
+    @Test
+    public void timezoneTest() throws ParseException {
+        Date d = SIMPLE_DATE_FORMAT.parse("2016-02-11T10:28:43.464+0300");
+        TimeZone gmt = TimeZone.getTimeZone("GMT+2");
+        Calendar c = Calendar.getInstance(gmt);
+        c.setTimeZone(gmt);
+        c.set(Calendar.ZONE_OFFSET,3*3600000);
+        c.setTime(d);
+        c.setTimeZone(gmt);
+        c=Calendar.getInstance();
+        c.set(Calendar.ZONE_OFFSET,5*3600000);
+        c.set(2016,1,24,13,24,56);
+        //  c.set(Calendar.ZONE_OFFSET,2*3600000);
+
+        System.out.println(SIMPLE_DATE_FORMAT.format(c.getTime()));
     }
 
     private boolean equalDates(Calendar a, Calendar b) {

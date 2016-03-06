@@ -60,7 +60,9 @@ public class DateUtil {
     }
 
     public static String formatDate(Calendar value) {
-        String result = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(value.getTime());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        simpleDateFormat.setTimeZone(value.getTimeZone());
+        String result = simpleDateFormat.format(value.getTime());
         int o = value.getTimeZone().getRawOffset();
         if (o == 0) {
             result = result + 'Z';
