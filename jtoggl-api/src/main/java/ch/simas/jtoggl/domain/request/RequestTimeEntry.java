@@ -18,11 +18,11 @@ public class RequestTimeEntry {
 
     public RequestTimeEntry(TimeEntry timeEntry) {
         this.time_entry = timeEntry.clone();
-        if (this.time_entry.getWid() == null && this.time_entry.getWorkspace() != null) {
-            this.time_entry.setWid(this.time_entry.getWorkspace().getId());
+        if (this.time_entry.getWorkspaceId() == null && this.time_entry.getWorkspace() != null) {
+            this.time_entry.setWorkspaceId(this.time_entry.getWorkspace().getId());
         }
-        if (this.time_entry.getPid() == null && this.time_entry.getProject() != null) {
-            this.time_entry.setPid(this.time_entry.getProject().getId());
+        if (this.time_entry.getProjectId() == null && this.time_entry.getProject() != null) {
+            this.time_entry.setProjectId(this.time_entry.getProject().getId());
         }
         this.time_entry.setProject(null);
         this.time_entry.setWorkspace(null);

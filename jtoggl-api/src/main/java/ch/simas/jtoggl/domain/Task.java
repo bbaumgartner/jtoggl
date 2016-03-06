@@ -21,6 +21,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,24 +33,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Cloneable {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
-    private Long estimated_seconds;
-    private Boolean is_active;
+    @JsonProperty("estimated_seconds")
+    private Long estimatedSeconds;
+    @JsonProperty("active")
+    private Boolean active;
     private Workspace workspace;
     private Project project;
     private User user;
-    private Long pid;
+    @JsonProperty("pid")
+    private Long projectId;
+    @JsonProperty("wid")
+    private Long workspaceId;
 
     public Task() {
     }
 
-    public Long getEstimated_seconds() {
-        return estimated_seconds;
+    public Long getEstimatedSeconds() {
+        return estimatedSeconds;
     }
 
-    public void setEstimated_seconds(Long estimated_seconds) {
-        this.estimated_seconds = estimated_seconds;
+    public void setEstimatedSeconds(Long estimatedSeconds) {
+        this.estimatedSeconds = estimatedSeconds;
     }
 
     public Long getId() {
@@ -61,11 +69,11 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
     }
 
     public Boolean isIs_active() {
-        return is_active;
+        return active;
     }
 
-    public void setIs_active(Boolean is_active) {
-        this.is_active = is_active;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getName() {
@@ -103,8 +111,8 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", estimated_seconds=" + estimated_seconds + ", is_active="
-                + is_active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", estimatedSeconds=" + estimatedSeconds + ", active="
+                + active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
     }
 
     @Override
@@ -144,19 +152,27 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
         Task tk = new Task();
         tk.id = id;
         tk.name = name;
-        tk.estimated_seconds = estimated_seconds;
-        tk.is_active = is_active;
+        tk.estimatedSeconds = estimatedSeconds;
+        tk.active = active;
         tk.workspace = workspace;
         tk.project = project;
         tk.user = user;
         return tk;
     }
 
-    public Long getPid() {
-        return pid;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setPid(Long pid) {
-        this.pid = pid;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

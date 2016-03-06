@@ -21,6 +21,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,8 +33,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Workspace extends AbstractDataWrapper<Workspace> implements IData<Workspace> {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("premium")
     private Boolean premium;
 
     public Workspace() {

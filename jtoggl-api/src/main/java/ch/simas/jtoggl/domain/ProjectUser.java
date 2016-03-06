@@ -20,6 +20,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,24 +32,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IData<ProjectUser> {
 
+    @JsonProperty("id")
     private Long id;
-    private Double hourly_rate;
+    @JsonProperty("rate")
+    private Double hourlyRate;
+    @JsonProperty("manager")
     private Boolean manager;
     private Project project;
     private User user;
-    private Long pid;
-    private Long uid;
+    @JsonProperty("pid")
+    private Long projectId;
+    @JsonProperty("uid")
+    private Long userId;
+    @JsonProperty("wid")
+    private Long workspaceId;
 
     public ProjectUser() {
     }
 
 
-    public Double getHourly_rate() {
-        return hourly_rate;
+    public Double getHourlyRate() {
+        return hourlyRate;
     }
 
-    public void setHourly_rate(Double hourly_rate) {
-        this.hourly_rate = hourly_rate;
+    public void setHourlyRate(Double hourlyRate) {
+        this.hourlyRate = hourlyRate;
     }
 
     public Long getId() {
@@ -86,7 +94,7 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
 
     @Override
     public String toString() {
-        return "ProjectUser{" + "id=" + id + ", hourly_rate=" + hourly_rate + ", manager=" + manager + ", project=" +
+        return "ProjectUser{" + "id=" + id + ", hourlyRate=" + hourlyRate + ", manager=" + manager + ", project=" +
                 project + ", user=" + user + '}';
     }
 
@@ -122,33 +130,41 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
         super.setData(data);
     }
 
-    public Long getPid() {
-        return pid;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setPid(Long pid) {
-        this.pid = pid;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
-    public Long getUid() {
-        return uid;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUid(Long uid) {
-        this.uid = uid;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override
     public ProjectUser clone() {
         ProjectUser pu = new ProjectUser();
         pu.id = id;
-        pu.hourly_rate = hourly_rate;
+        pu.hourlyRate = hourlyRate;
         pu.manager = manager;
         pu.project = project;
         pu.user = user;
-        pu.pid = pid;
-        pu.uid = uid;
+        pu.projectId = projectId;
+        pu.userId = userId;
         return pu;
 
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

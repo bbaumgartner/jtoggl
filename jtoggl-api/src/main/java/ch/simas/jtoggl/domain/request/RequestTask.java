@@ -18,8 +18,8 @@ public class RequestTask {
 
     public RequestTask(Task task) {
         this.task = task.clone();
-        if (this.task.getPid() == null && this.task.getProject() != null) {
-            this.task.setPid(task.getProject().getId());
+        if (this.task.getProjectId() == null && this.task.getProject() != null) {
+            this.task.setProjectId(task.getProject().getId());
         }
         this.task.setWorkspace(null);
         this.task.setProject(null);

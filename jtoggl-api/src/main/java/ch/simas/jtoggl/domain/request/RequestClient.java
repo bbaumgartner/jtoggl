@@ -18,8 +18,8 @@ public class RequestClient {
 
     public RequestClient(ProjectClient clientObject) {
         client = clientObject.clone();
-        if (client.getWid() == null && client.getWorkspace() != null) {
-            client.setWid(client.getWorkspace().getId());
+        if (client.getWorkspaceId() == null && client.getWorkspace() != null) {
+            client.setWorkspaceId(client.getWorkspace().getId());
         }
         client.setWorkspace(null);
         client.setData(null);

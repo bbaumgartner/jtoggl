@@ -22,6 +22,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -33,9 +34,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
     private Workspace workspace;
+    @JsonProperty("wid")
+    private Long wid;
 
     public Tag() {
     }
@@ -101,5 +106,13 @@ public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
     @Override
     public void setData(Tag data) {
         super.setData(data);
+    }
+
+    public Long getWid() {
+        return wid;
+    }
+
+    public void setWid(Long wid) {
+        this.wid = wid;
     }
 }

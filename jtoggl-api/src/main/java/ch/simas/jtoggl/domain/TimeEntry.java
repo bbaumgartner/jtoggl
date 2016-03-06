@@ -22,6 +22,7 @@ import ch.simas.jtoggl.CustomDateDeserializer;
 import ch.simas.jtoggl.CustomDateSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -40,24 +41,36 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<TimeEntry>, Cloneable {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("description")
     private String description;
     private Project project;
+    @JsonProperty("start")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
     private Calendar start;
+    @JsonProperty("stop")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
     private Calendar stop;
+    @JsonProperty("duration")
     private long duration;
+    @JsonProperty("billable")
     private Boolean billable;
     private Workspace workspace;
-    private List<String> tag_names;//= new ArrayList<String>();
-    private String created_with;
-    private Boolean duronly;
-    private Long pid;
-    private Long wid;
-    private Long tid;
+    @JsonProperty("tags")
+    private List<String> tags;//= new ArrayList<String>();
+    @JsonProperty("created_with")
+    private String createdWith;
+    @JsonProperty("duronly")
+    private Boolean durationOnly;
+    @JsonProperty("pid")
+    private Long projectId;
+    @JsonProperty("wid")
+    private Long workspaceId;
+    @JsonProperty("tid")
+    private Long taskId;
 
     public TimeEntry() {
     }
@@ -94,12 +107,12 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         this.id = id;
     }
 
-    public Boolean getDuronly() {
-        return duronly;
+    public Boolean getDurationOnly() {
+        return durationOnly;
     }
 
-    public void setDuronly(Boolean duronly) {
-        this.duronly = duronly;
+    public void setDurationOnly(Boolean durationOnly) {
+        this.durationOnly = durationOnly;
     }
 
     public Project getProject() {
@@ -109,7 +122,7 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
     public void setProject(Project project) {
         this.project = project;
         if (project != null) {
-            this.pid = project.getId();
+            this.projectId = project.getId();
         }
     }
 
@@ -129,12 +142,12 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         this.stop = stop;
     }
 
-    public List<String> getTag_names() {
-        return tag_names;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setTag_names(List<String> tag_names) {
-        this.tag_names = tag_names;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public Workspace getWorkspace() {
@@ -144,40 +157,40 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
         if (workspace != null) {
-            this.wid = workspace.getId();
+            this.workspaceId = workspace.getId();
         }
     }
 
-    public String getCreated_with() {
-        return created_with;
+    public String getCreatedWith() {
+        return createdWith;
     }
 
-    public void setCreated_with(String created_with) {
-        this.created_with = created_with;
+    public void setCreatedWith(String createdWith) {
+        this.createdWith = createdWith;
     }
 
-    public Long getWid() {
-        return wid;
+    public Long getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setWid(Long wid) {
-        this.wid = wid;
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
-    public Long getPid() {
-        return pid;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setPid(Long pid) {
-        this.pid = pid;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
-    public Long getTid() {
-        return tid;
+    public Long getTaskId() {
+        return taskId;
     }
 
-    public void setTid(Long tid) {
-        this.tid = tid;
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
 
@@ -186,7 +199,7 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         DateFormat f = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.LONG);
         return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" +
                 (start == null ? "null" : f.format(start.getTime())) + ", stop=" + (stop == null ? "null" : f.format(stop.getTime())) + ", duration=" + duration + ", billable=" + billable + ", workspace=" +
-                workspace + ", tag_names=" + tag_names + ", duronly=" + duronly + ", tid = " + tid + '}';
+                workspace + ", tags=" + tags + ", durationOnly=" + durationOnly + ", taskId = " + taskId + '}';
     }
 
     @Override
@@ -232,12 +245,12 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         te.duration = duration;
         te.billable = billable;
         te.workspace = workspace;
-        te.tag_names = tag_names;
-        te.created_with = created_with;
-        te.duronly = duronly;
-        te.pid = pid;
-        te.wid = wid;
-        te.tid = tid;
+        te.tags = tags;
+        te.createdWith = createdWith;
+        te.durationOnly = durationOnly;
+        te.projectId = projectId;
+        te.workspaceId = workspaceId;
+        te.taskId = taskId;
         return te;
     }
 }

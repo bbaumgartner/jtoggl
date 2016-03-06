@@ -18,8 +18,8 @@ public class RequestProject {
 
     public RequestProject(Project project) {
         this.project = project.clone();
-        if (this.project.getWid() == null && this.project.getWorkspace() != null) {
-            this.project.setWid(this.project.getWorkspace().getId());
+        if (this.project.getWorkspaceId() == null && this.project.getWorkspace() != null) {
+            this.project.setWorkspaceId(this.project.getWorkspace().getId());
         }
         this.project.setWorkspace(null);
         this.project.setData(null);

@@ -21,6 +21,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,15 +33,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Project extends AbstractDataWrapper<Project> implements IData<Project>, Cloneable {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("billable")
     private Boolean billable;
     private Workspace workspace;
+    @JsonProperty("active")
     private Boolean active;
-    private Boolean is_private;
+    @JsonProperty("is_private")
+    private Boolean isPrivate;
+    @JsonProperty("template")
     private Boolean template;
-    private Long cid;
-    private Long wid;
+    @JsonProperty("cid")
+    private Long clientId;
+    @JsonProperty("wid")
+    private Long workspaceId;
 
     public Project() {
     }
@@ -62,12 +71,12 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
         this.name = name;
     }
 
-    public Long getCid() {
-        return cid;
+    public Long getClientId() {
+        return clientId;
     }
 
-    public void setCid(Long cid) {
-        this.cid = cid;
+    public void setClientId(Long clientId) {
+        this.clientId = clientId;
     }
 
     public Workspace getWorkspace() {
@@ -89,8 +98,8 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
 
     @Override
     public String toString() {
-        return "Project{" + "id=" + id + ", name=" + name + ", active=" + active + ", is_private=" + is_private + ", " +
-                "template=" + template + ", billable=" + billable + ", cid=" + cid + ", workspace=" + workspace + '}';
+        return "Project{" + "id=" + id + ", name=" + name + ", active=" + active + ", isPrivate=" + isPrivate + ", " +
+                "template=" + template + ", billable=" + billable + ", clientId=" + clientId + ", workspace=" + workspace + '}';
     }
 
     @Override
@@ -133,17 +142,17 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
         pr.billable = billable;
         pr.workspace = workspace;
         pr.active = active;
-        pr.is_private = is_private;
+        pr.isPrivate = isPrivate;
         pr.template = template;
-        pr.cid = cid;
+        pr.clientId = clientId;
         return pr;
     }
 
-    public Long getWid() {
-        return wid;
+    public Long getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setWid(Long wid) {
-        this.wid = wid;
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 }

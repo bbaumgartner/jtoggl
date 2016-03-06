@@ -18,11 +18,11 @@ public class RequestProjectUser {
 
     public RequestProjectUser(ProjectUser task) {
         this.project_user = task.clone();
-        if (this.project_user.getPid() == null && this.project_user.getProject() != null) {
-            this.project_user.setPid(task.getProject().getId());
+        if (this.project_user.getProjectId() == null && this.project_user.getProject() != null) {
+            this.project_user.setProjectId(task.getProject().getId());
         }
-        if (this.project_user.getUid() == null && this.project_user.getUser() != null) {
-            this.project_user.setUid(task.getUser().getId());
+        if (this.project_user.getUserId() == null && this.project_user.getUser() != null) {
+            this.project_user.setUserId(task.getUser().getId());
         }
         this.project_user.setProject(null);
         this.project_user.setUser(null);

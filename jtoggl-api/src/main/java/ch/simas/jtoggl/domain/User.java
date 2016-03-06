@@ -21,8 +21,8 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -34,56 +34,68 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User extends AbstractDataWrapper<User> implements IData<User> {
 
+    @JsonProperty("id")
     private Long id;
-    private String jquery_timeofday_format;
-    private String api_token;
-    private Long time_entry_retention_days;
-    private String jquery_date_format;
-    private String date_format;
-    @XmlElement(name="default_wid")
-    private Long default_workspace_id;
+    @JsonProperty("jquery_timeofday_format")
+    private String jqueryTimeOfDayFormat;
+    @JsonProperty("apiToken")
+    private String apiToken;
+    @JsonProperty("retention")
+    private Long timeEntryRetentionDays;
+    @JsonProperty("jquery_date_format")
+    private String jqueryDateFormat;
+    @JsonProperty("date_format")
+    private String dateFormat;
+    @JsonProperty("default_wid")
+    private Long defaultWorkspaceId;
+    @JsonProperty("fullname")
     private String fullname;
+    @JsonProperty("language")
     private String language;
-    private Long beginning_of_week;
-    private String timeofday_format;
+    @JsonProperty("beginning_of_week")
+    private Long beginningOfWeek;
+    @JsonProperty("timeofdayFormat")
+    private String timeofdayFormat;
+    @JsonProperty("email")
     private String email;
-    @XmlElement(name="timezone")
+    @JsonProperty("timezone")
     private String timezone;
+    @JsonProperty("store_start_and_stop_time")
     private Boolean storeStartAndStopTime;
 
     public User() {
     }
 
-    public String getApi_token() {
-        return api_token;
+    public String getApiToken() {
+        return apiToken;
     }
 
-    public void setApi_token(String api_token) {
-        this.api_token = api_token;
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
     }
 
-    public Long getBeginning_of_week() {
-        return beginning_of_week;
+    public Long getBeginningOfWeek() {
+        return beginningOfWeek;
     }
 
-    public void setBeginning_of_week(Long beginning_of_week) {
-        this.beginning_of_week = beginning_of_week;
+    public void setBeginningOfWeek(Long beginningOfWeek) {
+        this.beginningOfWeek = beginningOfWeek;
     }
 
-    public String getDate_format() {
-        return date_format;
+    public String getDateFormat() {
+        return dateFormat;
     }
 
-    public void setDate_format(String date_format) {
-        this.date_format = date_format;
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 
-    public Long getDefault_workspace_id() {
-        return default_workspace_id;
+    public Long getDefaultWorkspaceId() {
+        return defaultWorkspaceId;
     }
 
-    public void setDefault_workspace_id(Long default_workspace_id) {
-        this.default_workspace_id = default_workspace_id;
+    public void setDefaultWorkspaceId(Long defaultWorkspaceId) {
+        this.defaultWorkspaceId = defaultWorkspaceId;
     }
 
     public String getEmail() {
@@ -110,20 +122,20 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
         this.id = id;
     }
 
-    public String getJquery_date_format() {
-        return jquery_date_format;
+    public String getJqueryDateFormat() {
+        return jqueryDateFormat;
     }
 
-    public void setJquery_date_format(String jquery_date_format) {
-        this.jquery_date_format = jquery_date_format;
+    public void setJqueryDateFormat(String jqueryDateFormat) {
+        this.jqueryDateFormat = jqueryDateFormat;
     }
 
-    public String getJquery_timeofday_format() {
-        return jquery_timeofday_format;
+    public String getJqueryTimeOfDayFormat() {
+        return jqueryTimeOfDayFormat;
     }
 
-    public void setJquery_timeofday_format(String jquery_timeofday_format) {
-        this.jquery_timeofday_format = jquery_timeofday_format;
+    public void setJqueryTimeOfDayFormat(String jqueryTimeOfDayFormat) {
+        this.jqueryTimeOfDayFormat = jqueryTimeOfDayFormat;
     }
 
     public String getLanguage() {
@@ -134,24 +146,24 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
         this.language = language;
     }
 
-    public Long getTime_entry_retention_days() {
-        return time_entry_retention_days;
+    public Long getTimeEntryRetentionDays() {
+        return timeEntryRetentionDays;
     }
 
-    public void setTime_entry_retention_days(Long time_entry_retention_days) {
-        this.time_entry_retention_days = time_entry_retention_days;
+    public void setTimeEntryRetentionDays(Long timeEntryRetentionDays) {
+        this.timeEntryRetentionDays = timeEntryRetentionDays;
     }
 
-    public String getTimeofday_format() {
-        return timeofday_format;
+    public String getTimeofdayFormat() {
+        return timeofdayFormat;
     }
 
     public String getTimezone() {
         return timezone;
     }
 
-    public void setTimeofday_format(String timeofday_format) {
-        this.timeofday_format = timeofday_format;
+    public void setTimeofdayFormat(String timeofdayFormat) {
+        this.timeofdayFormat = timeofdayFormat;
     }
 
     public Boolean getStoreStartAndStopTime() {
@@ -164,11 +176,11 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", jquery_timeofday_format=" + jquery_timeofday_format + ", api_token=" +
-                api_token + ", time_entry_retention_days=" + time_entry_retention_days + ", jquery_date_format=" +
-                jquery_date_format + ", date_format=" + date_format + ", default_workspace_id=" +
-                default_workspace_id + ", fullname=" + fullname + ", language=" + language + ", beginning_of_week=" +
-                beginning_of_week + ", timeofday_format=" + timeofday_format + ", email=" + email + '}';
+        return "User{" + "id=" + id + ", jqueryTimeOfDayFormat=" + jqueryTimeOfDayFormat + ", apiToken=" +
+                apiToken + ", timeEntryRetentionDays=" + timeEntryRetentionDays + ", jqueryDateFormat=" +
+                jqueryDateFormat + ", dateFormat=" + dateFormat + ", defaultWorkspaceId=" +
+                defaultWorkspaceId + ", fullname=" + fullname + ", language=" + language + ", beginningOfWeek=" +
+                beginningOfWeek + ", timeofdayFormat=" + timeofdayFormat + ", email=" + email + '}';
     }
 
     @Override

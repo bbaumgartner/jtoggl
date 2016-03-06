@@ -20,6 +20,7 @@ package ch.simas.jtoggl.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,13 +32,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements IData<ProjectClient>, Cloneable {
 
+    @JsonProperty("id")
     private Long id;
+    @JsonProperty("name")
     private String name;
-    private String hourly_rate;
+    @JsonProperty("hrate")
+    private String hourlyRate;
+    @JsonProperty("cur")
     private String currency;
     private Workspace workspace;
+    @JsonProperty("notes")
     private String notes;
-    private Long wid;
+    @JsonProperty("wid")
+    private Long workspaceId;
 
     public ProjectClient() {
     }
@@ -67,12 +74,12 @@ public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements
         this.currency = currency;
     }
 
-    public String getHourly_rate() {
-        return hourly_rate;
+    public String getHourlyRate() {
+        return hourlyRate;
     }
 
-    public void setHourly_rate(String hourly_rate) {
-        this.hourly_rate = hourly_rate;
+    public void setHourlyRate(String hourlyRate) {
+        this.hourlyRate = hourlyRate;
     }
 
     public String getNotes() {
@@ -94,7 +101,7 @@ public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements
 
     @Override
     public String toString() {
-        return "Client{" + "id=" + id + ", name=" + name + ", hourly_rate=" + hourly_rate + ", currency=" + currency
+        return "Client{" + "id=" + id + ", name=" + name + ", hourlyRate=" + hourlyRate + ", currency=" + currency
                 + ", notes=" + notes + ", workspace=" + workspace + '}';
     }
 
@@ -130,24 +137,24 @@ public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements
         super.setData(data);
     }
 
-    public Long getWid() {
-        return wid;
+    public Long getWorkspaceId() {
+        return workspaceId;
     }
 
-    public void setWid(Long wid) {
-        this.wid = wid;
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
     }
 
     @Override
     public ProjectClient clone() {
         ProjectClient cl = new ProjectClient();
-        cl.id=id;
-        cl.name=name;
-        cl.hourly_rate=hourly_rate;
-        cl.currency=currency;
-        cl.workspace=workspace;
-        cl.notes=notes;
-        cl.wid=wid;
+        cl.id = id;
+        cl.name = name;
+        cl.hourlyRate = hourlyRate;
+        cl.currency = currency;
+        cl.workspace = workspace;
+        cl.notes = notes;
+        cl.workspaceId = workspaceId;
         return cl;
     }
 }

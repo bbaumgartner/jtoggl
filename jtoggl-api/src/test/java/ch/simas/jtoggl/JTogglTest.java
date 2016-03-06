@@ -29,7 +29,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -73,7 +72,7 @@ public class JTogglTest {
                 throw new RuntimeException("TOGGL_PASSWORD not set.");
             }
             togglPassword = Base64.getEncoder().encodeToString(togglPassword.getBytes());
-            togglApiToken = new JToggl(togglUsername, togglPassword).getCurrentUser().getApi_token();
+            togglApiToken = new JToggl(togglUsername, togglPassword).getCurrentUser().getApiToken();
         }
         if (togglApiToken == null) {
             throw new RuntimeException("TOGGL_API_TOKEN not set.");
@@ -172,7 +171,7 @@ public class JTogglTest {
         timeEntry.setWorkspace(workspace);
         timeEntry.setProject(project);
         timeEntry.setDescription("ABCD");
-        timeEntry.setCreated_with("JToggl Unit Test");
+        timeEntry.setCreatedWith("JToggl Unit Test");
 
         TimeEntry te = jToggl.startTimeEntry(timeEntry);
 
@@ -261,7 +260,7 @@ public class JTogglTest {
     @Test
     public void updateTask() {
         if (task == null) return;
-        task.setIs_active(false);
+        task.setActive(false);
         try {
             Task t = jToggl.updateTask(task);
             Assert.assertNotNull(t);
@@ -299,7 +298,7 @@ public class JTogglTest {
         cal.set(Calendar.MILLISECOND, 0);
         entry.setStop(cal);
         entry.setDescription("From JUnit Test");
-        entry.setCreated_with("JUnit");
+        entry.setCreatedWith("JUnit");
 
         entry = jToggl.createTimeEntry(entry);
         Assert.assertNotNull(entry);
@@ -328,7 +327,7 @@ public class JTogglTest {
 
         Project pr = new Project();
         pr.setName("JUnit Project");
-        pr.setCid(client.getId());
+        pr.setClientId(client.getId());
 
         List<Workspace> ws = jToggl.getWorkspaces();
         pr.setWorkspace(ws.get(0));
@@ -342,7 +341,7 @@ public class JTogglTest {
     private static Task createTask() {
         Task t = new Task();
         t.setName("JUnit Task " + new Date());
-        t.setIs_active(true);
+        t.setActive(true);
         t.setProject(project);
 
         t = jToggl.createTask(t);
