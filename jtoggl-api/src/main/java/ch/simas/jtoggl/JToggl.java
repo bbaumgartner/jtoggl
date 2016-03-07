@@ -86,6 +86,7 @@ public class JToggl {
 
     private boolean log = false;
     private long throttlePeriod = 0L;
+    private Client client;
 
     /**
      * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
@@ -509,20 +510,22 @@ public class JToggl {
     }
 
     protected Client prepareClient() {
-        ClientConfig clientConfig = new ClientConfig();
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
-        clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
-        // clientConfig.register(JacksonConfigurator.class);
-        clientConfig.register(JacksonFeature.class);
-        Client client =
-                JerseyClientBuilder.createClient(clientConfig);
-        client.register(HttpAuthenticationFeature.basic(user, password));
-        if (log) {
-            LoggingFilter loggingFilter = new LoggingFilter();
-            client.register(loggingFilter);
-        }
-        if (throttlePeriod > 0L) {
-            client.register(new DelayFilter(throttlePeriod));
+        if (client == null) {
+            ClientConfig clientConfig = new ClientConfig();
+            clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
+            clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
+            // clientConfig.register(JacksonConfigurator.class);
+            clientConfig.register(JacksonFeature.class);
+
+            client = JerseyClientBuilder.createClient(clientConfig);
+            client.register(HttpAuthenticationFeature.basic(user, password));
+            if (log) {
+                LoggingFilter loggingFilter = new LoggingFilter();
+                client.register(loggingFilter);
+            }
+            if (throttlePeriod > 0L) {
+                client.register(new DelayFilter(throttlePeriod));
+            }
         }
         return client;
     }

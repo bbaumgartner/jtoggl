@@ -29,7 +29,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -51,9 +50,9 @@ public class JTogglTest {
     @BeforeClass
     public static void beforeClass() throws Exception {
 
-        String togglUsername = System.getenv("TOGGL_USER_NAME");
+        String togglUsername = System.getenv("TOGGL_USERNAME");
         if (togglUsername == null) {
-            togglUsername = System.getProperty("TOGGL_USER_NAME");
+            togglUsername = System.getProperty("TOGGL_USERNAME");
         }
         String togglPassword = System.getenv("TOGGL_PASSWORD");
         if (togglPassword == null) {
@@ -66,12 +65,11 @@ public class JTogglTest {
         }
         if (togglApiToken == null) {
             if (togglUsername == null) {
-                throw new RuntimeException("TOGGL_USER_NAME not set.");
+                throw new RuntimeException("TOGGL_USERNAME not set.");
             }
             if (togglPassword == null) {
                 throw new RuntimeException("TOGGL_PASSWORD not set.");
             }
-            togglPassword = Base64.getEncoder().encodeToString(togglPassword.getBytes());
             togglApiToken = new JToggl(togglUsername, togglPassword).getCurrentUser().getApiToken();
         }
         if (togglApiToken == null) {

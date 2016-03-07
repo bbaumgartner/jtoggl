@@ -38,7 +38,7 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
     private Long id;
     @JsonProperty("jquery_timeofday_format")
     private String jqueryTimeOfDayFormat;
-    @JsonProperty("apiToken")
+    @JsonProperty("api_token")
     private String apiToken;
     @JsonProperty("retention")
     private Long timeEntryRetentionDays;
@@ -54,7 +54,7 @@ public class User extends AbstractDataWrapper<User> implements IData<User> {
     private String language;
     @JsonProperty("beginning_of_week")
     private Long beginningOfWeek;
-    @JsonProperty("timeofdayFormat")
+    @JsonProperty("timeofday_format")
     private String timeofdayFormat;
     @JsonProperty("email")
     private String email;
