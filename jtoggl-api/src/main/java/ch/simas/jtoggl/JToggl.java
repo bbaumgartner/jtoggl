@@ -32,6 +32,9 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import javax.ws.rs.client.Client;
@@ -129,12 +132,12 @@ public class JToggl {
      * @param endDate
      * @return list of {@link TimeEntry}
      */
-    public List<TimeEntry> getTimeEntries(DateTime startDate, DateTime endDate) {
+    public List<TimeEntry> getTimeEntries(LocalDate startDate, LocalDate endDate) {
 
         return prepareRequest(TIME_ENTRIES,
                 (startDate != null && endDate != null) ? ImmutableMap.of(
-                        "start_date", ISODateTimeFormat.dateTime().print(startDate),
-                        "end_date", ISODateTimeFormat.dateTime().print(endDate))
+                        "start_date", ISODateTimeFormat.dateTime().print(startDate.toDateTimeAtStartOfDay()),
+                        "end_date", ISODateTimeFormat.dateTime().print(endDate.toDateTimeAtStartOfDay().plus(Days.days(1))))
                         : null).get(new GenericType<List<TimeEntry>>() {
         });
     }

@@ -25,6 +25,7 @@ import ch.simas.jtoggl.domain.TimeEntry;
 import ch.simas.jtoggl.domain.User;
 import ch.simas.jtoggl.domain.Workspace;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -120,14 +121,14 @@ public class JTogglTest {
 
     @Test
     public void getTimeEntriesWithRange() {
-        List<TimeEntry> entries = jToggl.getTimeEntries(DateTime.parse("2011-10-10T00:00"), DateTime.parse("2011-10-10T00:00"));
+        List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.parse("2011-10-10"), LocalDate.parse("2011-10-10"));
 
         Assert.assertTrue(entries.isEmpty());
     }
 
     @Test
     public void getTimeEntriesWithRange2() {
-        List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart(), timeEntry.getStop());
+        List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop().toLocalDate());
 
         Assert.assertTrue(!entries.isEmpty());
     }
