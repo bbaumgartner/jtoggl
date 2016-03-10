@@ -25,11 +25,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.joda.time.DateTime;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 
 
@@ -49,11 +47,11 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
     @JsonProperty("start")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    private Calendar start;
+    private DateTime start;
     @JsonProperty("stop")
     @JsonSerialize(using = CustomDateSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    private Calendar stop;
+    private DateTime stop;
     @JsonProperty("duration")
     private long duration;
     @JsonProperty("billable")
@@ -126,19 +124,19 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         }
     }
 
-    public Calendar getStart() {
+    public DateTime getStart() {
         return start;
     }
 
-    public void setStart(Calendar start) {
+    public void setStart(DateTime start) {
         this.start = start;
     }
 
-    public Calendar getStop() {
+    public DateTime getStop() {
         return stop;
     }
 
-    public void setStop(Calendar stop) {
+    public void setStop(DateTime stop) {
         this.stop = stop;
     }
 
@@ -196,9 +194,8 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
 
     @Override
     public String toString() {
-        DateFormat f = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.LONG, SimpleDateFormat.LONG);
         return "TimeEntry{" + "id=" + id + ", description=" + description + ", project=" + project + ", start=" +
-                (start == null ? "null" : f.format(start.getTime())) + ", stop=" + (stop == null ? "null" : f.format(stop.getTime())) + ", duration=" + duration + ", billable=" + billable + ", workspace=" +
+                (start == null ? "null" : start + ", stop=" + (stop == null ? "null" : stop)) + ", duration=" + duration + ", billable=" + billable + ", workspace=" +
                 workspace + ", tags=" + tags + ", durationOnly=" + durationOnly + ", taskId = " + taskId + '}';
     }
 

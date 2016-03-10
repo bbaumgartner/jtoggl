@@ -24,13 +24,12 @@ import ch.simas.jtoggl.domain.Task;
 import ch.simas.jtoggl.domain.TimeEntry;
 import ch.simas.jtoggl.domain.User;
 import ch.simas.jtoggl.domain.Workspace;
+import org.joda.time.DateTime;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
@@ -121,9 +120,7 @@ public class JTogglTest {
 
     @Test
     public void getTimeEntriesWithRange() {
-        Calendar cal = Calendar.getInstance();
-        cal.set(2011, 11, 10, 0, 0);
-        List<TimeEntry> entries = jToggl.getTimeEntries(cal, cal);
+        List<TimeEntry> entries = jToggl.getTimeEntries(DateTime.parse("2011-10-10T00:00"), DateTime.parse("2011-10-10T00:00"));
 
         Assert.assertTrue(entries.isEmpty());
     }
@@ -212,7 +209,7 @@ public class JTogglTest {
     @Test
     public void updateClient() {
 
-        client.setNotes("Making more notes for update! " + new Date());
+        client.setNotes("Making more notes for update! " + DateTime.now().toString());
         ProjectClient cl = jToggl.updateClient(client);
 
         Assert.assertNotNull(cl);
@@ -288,13 +285,8 @@ public class JTogglTest {
         TimeEntry entry = new TimeEntry();
         entry.setDuration(480);
         entry.setBillable(true);
-        Calendar cal = Calendar.getInstance();
-        cal.set(2011, 10, 15, 8, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        entry.setStart(cal);
-        cal.set(2011, 10, 15, 16, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        entry.setStop(cal);
+        entry.setStart(DateTime.parse("2011-09-15T08:00:00"));
+        entry.setStop(DateTime.parse("2011-09-15T16:00:00"));
         entry.setDescription("From JUnit Test");
         entry.setCreatedWith("JUnit");
 
@@ -338,7 +330,7 @@ public class JTogglTest {
 
     private static Task createTask() {
         Task t = new Task();
-        t.setName("JUnit Task " + new Date());
+        t.setName("JUnit Task " + DateTime.now().toString());
         t.setActive(true);
         t.setProject(project);
 

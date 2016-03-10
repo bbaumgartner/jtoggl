@@ -20,7 +20,6 @@ package ch.simas.jtoggl;
 
 import ch.simas.jtoggl.domain.*;
 import ch.simas.jtoggl.domain.request.*;
-import ch.simas.jtoggl.util.DateUtil;
 import ch.simas.jtoggl.util.DelayFilter;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.hk2.api.Descriptor;
@@ -32,6 +31,8 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -128,12 +129,12 @@ public class JToggl {
      * @param endDate
      * @return list of {@link TimeEntry}
      */
-    public List<TimeEntry> getTimeEntries(Calendar startDate, Calendar endDate) {
+    public List<TimeEntry> getTimeEntries(DateTime startDate, DateTime endDate) {
 
         return prepareRequest(TIME_ENTRIES,
                 (startDate != null && endDate != null) ? ImmutableMap.of(
-                        "start_date", DateUtil.formatDate(startDate),
-                        "end_date", DateUtil.formatDate(endDate))
+                        "start_date", ISODateTimeFormat.dateTime().print(startDate),
+                        "end_date", ISODateTimeFormat.dateTime().print(endDate))
                         : null).get(new GenericType<List<TimeEntry>>() {
         });
     }

@@ -1,6 +1,7 @@
 package ch.simas.jtoggl;
 
 import com.fasterxml.jackson.core.*;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -8,12 +9,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by hpa on 5.3.16.
@@ -25,38 +25,15 @@ public class CustomDateDeserializerTest {
     @Test
     public void testDeserialize() throws Exception {
         CustomDateDeserializer d = new CustomDateDeserializer();
-        Calendar c = Calendar.getInstance();
 
-        c.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        SIMPLE_DATE_FORMAT.parse("2016-02-11T10:28:43.464+0100");
-        assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464+01:00"), null)));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464+01:00"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464+01:00"), null));
 
-        c.setTimeZone(TimeZone.getTimeZone("GMT+0:00"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464Z"), null)));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464Z"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464Z"), null));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464-01:00"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464+03:00"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464+03"), null));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464-04:30"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464-0430"), null));
 
-        c.setTimeZone(TimeZone.getTimeZone("GMT-1:00"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null)));
-
-        c.setTimeZone(TimeZone.getTimeZone("GMT+3:00"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464+03"), null)));
-
-        c.setTimeZone(TimeZone.getTimeZone("GMT-4:30"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        assertTrue("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-0430"), null)));
-
-        c.setTimeZone(TimeZone.getTimeZone("GMT+1:00"));
-        c.set(2016, Calendar.FEBRUARY, 11, 10, 28, 43);
-        c.set(Calendar.MILLISECOND, 464);
-        assertFalse("No matching dates", equalDates(c, d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null)));
+        assertEquals("No matching dates", DateTime.parse("2016-02-11T10:28:43.464+01:00"), d.deserialize(getJsonParser("2016-02-11T10:28:43.464-01:00"), null));
 
     }
 
@@ -77,16 +54,6 @@ public class CustomDateDeserializerTest {
         System.out.println(SIMPLE_DATE_FORMAT.format(c.getTime()));
     }
 
-    private boolean equalDates(Calendar a, Calendar b) {
-
-        int[] fields = new int[]{Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH, Calendar.HOUR, Calendar.MINUTE, Calendar.SECOND, Calendar.MILLISECOND, Calendar.ZONE_OFFSET};
-
-        for (int f : fields) {
-            if (a.get(f) != b.get(f))
-                return false;
-        }
-        return true;
-    }
 
     private JsonParser getJsonParser(final String value) {
         return new JsonParser() {
