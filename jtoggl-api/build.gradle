@@ -5,8 +5,13 @@ apply plugin: 'maven'
 version = 'jackson-2.0.1-SNAPSHOT'
 group = 'ch.simas.jtoggl'
 
-Properties buildProps = new Properties()
-buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
+if (project.rootProject.file('local.properties').exists()) {
+    Properties buildProps = new Properties()
+    buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
+    buildProps.each { prop ->
+        project.ext.set(prop.key, prop.value)
+    }
+}
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
