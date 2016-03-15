@@ -1,0 +1,48 @@
+language: java
+jdk: oraclejdk8
+env:
+  global:
+    - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
+
+script:
+  - ./gradlew build jacocoTestReport
+
+  after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+test:
+    post:
+        - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
+        - sudo pip install --user codecov && codecov:
+  
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file:
+    - android/build/outputs/lint-results_files/hololike.css
+    - android/build/outputs/lint-results_files/lint-error.png
+    - android/build/outputs/lint-results_files/lint-run.png
+    - android/build/outputs/lint-results_files/lint-warning.png
+    - android/build/outputs/lint-results.html
+    - android/build/outputs/lint-results.xml
+    - android/build/outputs/logs/manifest-merger-debug-report.txt
+    - android/build/outputs/logs/manifest-merger-release-report.txt
+    - android/build/outputs/apk/android-debug.apk
+    - android/build/outputs/apk/android-debug-unaligned.apk
+    - android/build/outputs/apk/android-release.apk
+    - android/build/outputs/apk/android-release-unaligned.apk
+    - android/build/outputs/lint-results-release-fatal_files/hololike.css
+    - android/build/outputs/lint-results-release-fatal.html
+    - android/build/outputs/lint-results-release-fatal.xml
+    - android/build/outputs/logs/manifest-merger-debug-report.txt
+    - android/build/outputs/logs/manifest-merger-release-report.txt
+    - android/build/outputs/mapping/release/dump.txt
+    - android/build/outputs/mapping/release/mapping.txt
+    - android/build/outputs/mapping/release/seeds.txt
+    - android/build/outputs/mapping/release/usage.txt
+    - android/build/reports/androidTests/connected/index.html
+
+  skip_cleanup: true
+  on:
+    tags: true
+
