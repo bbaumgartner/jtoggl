@@ -4,13 +4,13 @@ env:
   global:
     - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
 
-script: ./gradlew build jacocoTestReport
+script: ./gradlew -p jtoggl-api build jacocoTestReport
 
 after_success: "bash <(curl -s https://codecov.io/bash)"
 
 test:
     post:
-        - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
+        - if [ -e ./gradlew ]; then ./gradlew -p jtoggl-api jacocoTestReport;else gradle -p jtoggl-api jacocoTestReport;fi
         - sudo pip install --user codecov && codecov:
   
 deploy:
