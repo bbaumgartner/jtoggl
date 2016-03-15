@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
+apply plugin: "jacoco"
 
 version = 'jackson-2.0.1-SNAPSHOT'
 group = 'ch.simas.jtoggl'
