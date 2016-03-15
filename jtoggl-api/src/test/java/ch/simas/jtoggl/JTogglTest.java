@@ -92,6 +92,12 @@ public class JTogglTest {
         project = createProject();
         if (workspace.getPremium())
             task = createTask();
+
+        TimeEntry current = jToggl.getCurrentTimeEntry();
+        if (current != null) {
+            jToggl.stopTimeEntry(current);
+        }
+
     }
 
     @AfterClass
@@ -305,9 +311,9 @@ public class JTogglTest {
         cl.setWorkspace(workspace);
 
         List<ProjectClient> wc = jToggl.getWorkspaceClients(workspace.getId());
-        if(wc!=null){
-            for (ProjectClient c:wc){
-                if ("JUnit Client".equals(c.getName())){
+        if (wc != null) {
+            for (ProjectClient c : wc) {
+                if ("JUnit Client".equals(c.getName())) {
                     jToggl.destroyClient(c.getId());
                 }
             }
