@@ -1,2 +1,12 @@
+/target/
+/.classpath
+/.project
+/.settings/
+build
+local.properties
+*.swp
 .gradle
 gradle
+gradlew
+gradlew.bat
+*.iml
