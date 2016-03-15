@@ -389,7 +389,9 @@ public class JToggl {
         List<Workspace> workspaces = getWorkspaces();
         for (Workspace workspace : workspaces) {
             List<Task> workspaceTasks = getActiveWorkspaceTasks(workspace.getId());
-            tasks.addAll(workspaceTasks);
+            if (workspaceTasks != null) {
+                tasks.addAll(workspaceTasks);
+            }
         }
 
         return tasks;
