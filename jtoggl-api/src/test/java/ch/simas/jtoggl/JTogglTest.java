@@ -86,6 +86,7 @@ public class JTogglTest {
         assertTrue(workspaces.size() > 0);
         workspace = workspaces.get(0);
 
+
         client = createClient();
         timeEntry = createTimeEntry();
         project = createProject();
@@ -302,6 +303,15 @@ public class JTogglTest {
         ProjectClient cl = new ProjectClient();
         cl.setName("JUnit Client");
         cl.setWorkspace(workspace);
+
+        List<ProjectClient> wc = jToggl.getWorkspaceClients(workspace.getId());
+        if(wc!=null){
+            for (ProjectClient c:wc){
+                if ("JUnit Client".equals(c.getName())){
+                    jToggl.destroyClient(c.getId());
+                }
+            }
+        }
 
         cl = jToggl.createClient(cl);
         Assert.assertNotNull(cl);
