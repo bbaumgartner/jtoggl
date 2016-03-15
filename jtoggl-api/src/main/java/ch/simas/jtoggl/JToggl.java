@@ -18,8 +18,18 @@
  */
 package ch.simas.jtoggl;
 
-import ch.simas.jtoggl.domain.*;
-import ch.simas.jtoggl.domain.request.*;
+import ch.simas.jtoggl.domain.Project;
+import ch.simas.jtoggl.domain.ProjectClient;
+import ch.simas.jtoggl.domain.ProjectUser;
+import ch.simas.jtoggl.domain.Task;
+import ch.simas.jtoggl.domain.TimeEntry;
+import ch.simas.jtoggl.domain.User;
+import ch.simas.jtoggl.domain.Workspace;
+import ch.simas.jtoggl.domain.request.RequestClient;
+import ch.simas.jtoggl.domain.request.RequestProject;
+import ch.simas.jtoggl.domain.request.RequestProjectUser;
+import ch.simas.jtoggl.domain.request.RequestTask;
+import ch.simas.jtoggl.domain.request.RequestTimeEntry;
 import ch.simas.jtoggl.util.DelayFilter;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.hk2.api.Descriptor;
@@ -31,18 +41,23 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
-import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.*;
-import java.util.*;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * API Class for Toggl REST API.
@@ -137,7 +152,8 @@ public class JToggl {
         return prepareRequest(TIME_ENTRIES,
                 (startDate != null && endDate != null) ? ImmutableMap.of(
                         "start_date", ISODateTimeFormat.dateTime().print(startDate.toDateTimeAtStartOfDay()),
-                        "end_date", ISODateTimeFormat.dateTime().print(endDate.toDateTimeAtStartOfDay().plus(Days.days(1))))
+                        "end_date", ISODateTimeFormat.dateTime().print(endDate.toDateTimeAtStartOfDay().plus(Days
+                                .days(1))))
                         : null).get(new GenericType<List<TimeEntry>>() {
         });
     }
@@ -314,6 +330,9 @@ public class JToggl {
         List<Workspace> workspaces = getWorkspaces();
         for (Workspace workspace : workspaces) {
             List<Project> workspaceProjects = getWorkspaceProjects(workspace.getId());
+            if (workspaceProjects == null) {
+                return null;
+            }
             for (Project project : workspaceProjects) {
                 project.setWorkspace(workspace);
             }

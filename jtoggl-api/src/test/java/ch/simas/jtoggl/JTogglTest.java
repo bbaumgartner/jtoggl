@@ -128,7 +128,8 @@ public class JTogglTest {
 
     @Test
     public void getTimeEntriesWithRange2() {
-        List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop().toLocalDate());
+        List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop()
+                .toLocalDate());
 
         Assert.assertTrue(!entries.isEmpty());
     }
@@ -310,9 +311,11 @@ public class JTogglTest {
 
     private static Project createProject() {
         List<Project> projects = jToggl.getProjects();
-        for (Project project : projects) {
-            if ("JUnit Project".equals(project.getName())) {
-                return project;
+        if (projects != null) {
+            for (Project project : projects) {
+                if ("JUnit Project".equals(project.getName())) {
+                    return project;
+                }
             }
         }
 
