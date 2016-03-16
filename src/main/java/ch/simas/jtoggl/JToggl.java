@@ -315,8 +315,7 @@ public class JToggl {
      */
     public void destroyClient(Long id) {
 
-        prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, id.toString()))
-                .delete(String.class);
+        prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, id.toString())).delete(String.class);
     }
 
     /**

@@ -315,7 +315,7 @@ public class JTogglTest {
         if (wc != null) {
             for (ProjectClient c : wc) {
                 if ("JUnit Client".equals(c.getName())) {
-                    jToggl.destroyClient(c.getId());
+                   return c;
                 }
             }
         }
