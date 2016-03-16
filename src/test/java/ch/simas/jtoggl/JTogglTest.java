@@ -77,11 +77,11 @@ public class JTogglTest {
             throw new RuntimeException("TOGGL_API_TOKEN not set.");
         }
         jToggl = new JToggl(togglApiToken, "api_token");
+        jToggl.setThrottlePeriod(1000l);
+        jToggl.switchLoggingOn();
 
         User cu = jToggl.getCurrentUser();
 
-        jToggl.setThrottlePeriod(1000l);
-        jToggl.switchLoggingOn();
 
         List<Workspace> workspaces = jToggl.getWorkspaces();
         assertTrue(workspaces.size() > 0);
