@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/konikvranik/jtoggl.svg?branch=jackson)](https://travis-ci.org/konikvranik/jtoggl)
+[![codecov.io](https://codecov.io/github/konikvranik/jtoggl/coverage.svg?branch=master)](https://codecov.io/github/konikvranik/jtoggl?branch=master)
+
 <h1>What is it about?</h1>
 
 jtoggl wraps the Toggl REST/JSON API for Java. 
