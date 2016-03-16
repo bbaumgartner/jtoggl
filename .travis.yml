@@ -1,5 +1,7 @@
 language: java
-jdk: oraclejdk8
+
+jdk: oraclejdk7
+
 env:
   global:
     - GRADLE_OPTS="-Xmx512m -XX:MaxPermSize=512m"
@@ -8,11 +10,6 @@ script: ./gradlew build jacocoTestReport --stacktrace --info
 
 after_success: "bash <(curl -s https://codecov.io/bash)"
 
-test:
-    post:
-        - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
-        - sudo pip install --user codecov && codecov:
-  
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
