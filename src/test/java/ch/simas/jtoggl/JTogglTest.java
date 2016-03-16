@@ -80,7 +80,7 @@ public class JTogglTest {
 
         User cu = jToggl.getCurrentUser();
 
-        jToggl.setThrottlePeriod(500l);
+        jToggl.setThrottlePeriod(1000l);
         jToggl.switchLoggingOn();
 
         List<Workspace> workspaces = jToggl.getWorkspaces();
