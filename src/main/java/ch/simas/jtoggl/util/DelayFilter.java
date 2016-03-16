@@ -2,8 +2,7 @@ package ch.simas.jtoggl.util;
 
 
 import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
@@ -15,9 +14,10 @@ import java.io.IOException;
  * @author cewing
  */
 @Provider
-public class DelayFilter implements ClientResponseFilter {
+public class DelayFilter implements ClientRequestFilter {
 
     private long throttlePeriod;
+    private static long lastCall=0;
 
     public DelayFilter(long throttlePeriod) {
         if (throttlePeriod <= 0L) {
@@ -27,12 +27,15 @@ public class DelayFilter implements ClientResponseFilter {
     }
 
     @Override
-    public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
-        try {
-            Thread.sleep(throttlePeriod);
-        } catch (InterruptedException e) {
-            // ignore, except to propagate
-            Thread.currentThread().interrupt();
+    public void filter(ClientRequestContext requestContext) throws IOException {
+        while(lastCall+throttlePeriod> System.currentTimeMillis()){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                // ignore, except to propagate
+                Thread.currentThread().interrupt();
+            }
         }
+        lastCall=System.currentTimeMillis();
     }
 }
