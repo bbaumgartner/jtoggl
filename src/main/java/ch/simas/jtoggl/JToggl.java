@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * API Class for Toggl REST API.
@@ -544,7 +545,7 @@ public class JToggl {
             client = JerseyClientBuilder.createClient(clientConfig);
             client.register(HttpAuthenticationFeature.basic(user, password));
             if (log) {
-                LoggingFilter loggingFilter = new LoggingFilter();
+                LoggingFilter loggingFilter = new LoggingFilter(Logger.getLogger(LoggingFilter.class.getName()), true);
                 client.register(loggingFilter);
             }
             if (throttlePeriod > 0L) {
