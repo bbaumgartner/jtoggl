@@ -26,18 +26,19 @@ import ch.simas.jtoggl.domain.User;
 import ch.simas.jtoggl.domain.Workspace;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * @author Simon Martinelli
  */
+@Test
 public class JTogglTest {
 
     private static JToggl jToggl;
@@ -123,14 +124,14 @@ public class JTogglTest {
             System.out.println(te);
         }
 
-        Assert.assertFalse(entries.isEmpty());
+        assertFalse(entries.isEmpty());
     }
 
     @Test
     public void getTimeEntriesWithRange() {
         List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.parse("2011-10-10"), LocalDate.parse("2011-10-10"));
 
-        Assert.assertTrue(entries.isEmpty());
+        assertTrue(entries.isEmpty());
     }
 
     @Test
@@ -138,21 +139,21 @@ public class JTogglTest {
         List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop()
                 .toLocalDate());
 
-        Assert.assertTrue(!entries.isEmpty());
+        assertTrue(!entries.isEmpty());
     }
 
     @Test
     public void getTimeEntry() {
         TimeEntry te = jToggl.getTimeEntry(timeEntry.getId());
 
-        Assert.assertNotNull(te);
+        assertNotNull(te);
     }
 
     @Test
     public void getMissingTimeEntry() {
         TimeEntry te = jToggl.getTimeEntry(1l);
 
-        Assert.assertNull(te);
+        assertNull(te);
     }
 
     @Test
@@ -162,7 +163,7 @@ public class JTogglTest {
         timeEntry.setDescription(DESCRIPTION);
         TimeEntry te = jToggl.updateTimeEntry(timeEntry);
 
-        Assert.assertNotNull(te);
+        assertNotNull(te);
         Assert.assertEquals(DESCRIPTION, te.getDescription());
     }
 
@@ -180,19 +181,19 @@ public class JTogglTest {
         TimeEntry te = jToggl.startTimeEntry(timeEntry);
 
         try {
-            Assert.assertNotNull(te.getId());//created
+            assertNotNull(te.getId());//created
             Assert.assertTrue(te.getDuration() < 0);//running
 
             current = jToggl.getCurrentTimeEntry();
-            Assert.assertNotNull(current);
+            assertNotNull(current);
             Assert.assertEquals(current.getId(), te.getId());
 
             Thread.sleep(2000);
 
             TimeEntry stoppedTe = jToggl.stopTimeEntry(te);
 
-            Assert.assertEquals(te.getId(), stoppedTe.getId());
-            Assert.assertTrue(stoppedTe.toString(), stoppedTe.getDuration() > 1); //stopped
+            assertEquals(te.getId(), stoppedTe.getId());
+            assertTrue(stoppedTe.getDuration() > 1, stoppedTe.toString()); //stopped
 
             current = jToggl.getCurrentTimeEntry();
             Assert.assertNull(current);
@@ -205,14 +206,14 @@ public class JTogglTest {
     public void getWorkspaces() {
         List<Workspace> workspaces = jToggl.getWorkspaces();
 
-        Assert.assertFalse(workspaces.isEmpty());
+        assertFalse(workspaces.isEmpty());
     }
 
     @Test
     public void getClients() {
         List<ProjectClient> clients = jToggl.getClients();
 
-        Assert.assertFalse(clients.isEmpty());
+        assertFalse(clients.isEmpty());
     }
 
     @Test
@@ -221,7 +222,7 @@ public class JTogglTest {
         client.setNotes("Making more notes for update! " + DateTime.now().toString());
         ProjectClient cl = jToggl.updateClient(client);
 
-        Assert.assertNotNull(cl);
+        assertNotNull(cl);
         Assert.assertEquals(client.getNotes(), cl.getNotes());
     }
 
@@ -229,7 +230,7 @@ public class JTogglTest {
     public void getProjects() {
         List<Project> projects = jToggl.getProjects();
 
-        Assert.assertFalse(projects.isEmpty());
+        assertFalse(projects.isEmpty());
     }
 
     @Test
@@ -237,7 +238,7 @@ public class JTogglTest {
         project.setBillable(true);
         Project pr = jToggl.updateProject(project);
 
-        Assert.assertNotNull(pr);
+        assertNotNull(pr);
         if (workspace.getPremium()) {
             Assert.assertTrue(pr.isBillable());
         }
@@ -258,7 +259,7 @@ public class JTogglTest {
         List<Task> tasks = jToggl.getTasks();
 
         // TODO Task is only available in payed version
-        Assert.assertFalse(isPremium && tasks.isEmpty());
+        assertFalse(isPremium && tasks.isEmpty());
     }
 
     @Test
@@ -267,8 +268,8 @@ public class JTogglTest {
         task.setActive(false);
         try {
             Task t = jToggl.updateTask(task);
-            Assert.assertNotNull(t);
-            Assert.assertFalse(t.isIs_active());
+            assertNotNull(t);
+            assertFalse(t.isIs_active());
         } catch (Exception e) {
             // Ignore because Task is only for paying customers
         }
@@ -278,8 +279,8 @@ public class JTogglTest {
     public void getCurrentUser() {
         User user = jToggl.getCurrentUser();
 
-        Assert.assertNotNull(user);
-        Assert.assertNotNull(user.getTimezone());
+        assertNotNull(user);
+        assertNotNull(user.getTimezone());
         Assert.assertTrue(!user.getTimezone().isEmpty());
     }
 
@@ -300,7 +301,7 @@ public class JTogglTest {
         entry.setCreatedWith("JUnit");
 
         entry = jToggl.createTimeEntry(entry);
-        Assert.assertNotNull(entry);
+        assertNotNull(entry);
 
         return entry;
     }
@@ -320,7 +321,7 @@ public class JTogglTest {
         }
 
         cl = jToggl.createClient(cl);
-        Assert.assertNotNull(cl);
+        assertNotNull(cl);
 
         return cl;
     }
@@ -343,7 +344,7 @@ public class JTogglTest {
         pr.setWorkspace(ws.get(0));
 
         pr = jToggl.createProject(pr);
-        Assert.assertNotNull(pr);
+        assertNotNull(pr);
 
         return pr;
     }
@@ -355,7 +356,7 @@ public class JTogglTest {
         t.setProject(project);
 
         t = jToggl.createTask(t);
-        Assert.assertNotNull(t);
+        assertNotNull(t);
 
         return t;
     }

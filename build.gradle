@@ -23,90 +23,10 @@ buildscript {
     }
 }
 
-/*
-			Action<XmlProvider> buildPom(final Map pom){
-				return new Action<XmlProvider>() {
-					void execute(XmlProvider t) {
-						def node = t.asNode();
-						 logger.info("0XXXXXXXXXXXXXXXXXXX")
-						pom.each { k, v ->
-							logger.info("name: $k; value: $v")
-							def tp = v instanceof Map
-							logger.info("1XXXXXXXXXXXXXXXXXXX $tp")
-							if (v instanceof Map) {
-								logger.info("MaXXXXXXXXXXXXXXXXXXX")
-								def final nn = node.appendNode(k);
-								buildPom(v).execute(
-									new XmlProvider() {
-										Node asNode() {
-											return nn;
-										}
-										StringBuilder asString(){
-											return null;
-										}
-										Element asElement(){
-											return null;
-										}
-
-									}
-								);
-							} else if (v instanceof String) {
-								logger.info("StXXXXXXXXXXXXXXXXXXX")
-								node.appendNode(k, v);
-							}
-							logger.info("5XXXXXXXXXXXXXXXXXXX")
-						}
-
-						node.appendNode('url', 'http://code.google.com/p/jtoggl')
-						node.appendNode('name', 'jtoggl-api')
-						def scm = node.appendNode('scm')
-						scm.appendNode('developerConnection', 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api')
-						scm.appendNode('url', 'http://code.google.com/p/jtoggl')
-						def developers = node.appendNode('developers')
-						def developer = developers.appendNode('developer')
-						developer.appendNode('name', 'Simon Martinelli')
-						developer.appendNode('organization', 'simas GmbH')
-						developer.appendNode('email', 'sm@simas.ch')
-						developer = developers.appendNode('developer')
-						developer.appendNode('name', 'Petr Vraník')
-						developer.appendNode('organization', 'SuTeren')
-						developer.appendNode('email', 'petr@vranik.name')
-						def props = node.appendNode('properties')
-						props.appendNode('project.build.sourceEncoding', 'UTF-8')
-						props.appendNode('project.reporting.outputEncoding', 'UTF-8')
-
-					}
-				}
-			}
-*/
 publishing {
     publications {
         maven(MavenPublication) {
             from components.java
-            /*def pm = buildPom ([
-                    url: 'http://code.google.com/p/jtoggl',
-                    name: 'jtoggl-api',
-                    scm: [
-                        developerConnection: 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api',
-                        url: 'http://code.google.com/p/jtoggl'
-                    ],
-                    developers: [
-                        developer: [
-                            name: 'Simon Martinelli',
-                            organization: 'simas GmbH',
-                            email: 'sm@simas.ch'
-                        ],
-                        developer: [
-                            name: 'Petr Vraník',
-                            organization: 'SuTeren',
-                            email: 'petr@vranik.name'
-                        ],
-                    ],
-                    properties: [
-                        'project.build.sourceEncoding': 'UTF-8',
-                        'project.reporting.outputEncoding': 'UTF-8'
-                    ]
-            ])*/
             pom.withXml {
                 def node = asNode()
                 node.appendNode('url', 'http://code.google.com/p/jtoggl')
@@ -138,17 +58,15 @@ repositories {
 configurations {
     deployerJars
 }
+test {
+    useTestNG()
+    testLogging.showStandardStreams = true
 
-/*
-uploadArchives {
-	repositories.mavenDeployer {
-		configuration = configurations.deployerJars
-		repository(url: "scp://github.com/konikvranik/repository") {
-			authentication(userName: buildProps.getProperty('repository.username'), password: buildProps.getProperty('repository.password'))
-		}
-	}
+    // listen to standard out and standard error of the test JVM(s)
+    onOutput { descriptor, event ->
+        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message)
+    }
 }
-*/
 
 dependencies {
     def jerseyVersion = 2.18
@@ -160,7 +78,8 @@ dependencies {
     //compile 'javax.xml.bind:jaxb-api:2.2.12'
     compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
-    testCompile 'junit:junit:4.10'
+    testCompile 'org.testng:testng:6.9.10'
+
 
     deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
 }
