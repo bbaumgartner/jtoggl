@@ -12,13 +12,13 @@ after_success: "bash <(curl -s https://codecov.io/bash)"
 
 before_deploy:
   - ./gradlew publishMavenPublicationToMavenLocal
-  - cd ~/.m2/repository && zip -r ~/m2repo.zip ch/simas/jtoggl
+  - cd $HOME/.m2/repository && zip -r $HOME/m2repo.zip ch/simas/jtoggl
 
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
   file:
-    - m2repo.zip
+    - $HOME/m2repo.zip
     - build/libs/jtoggl-jackson-2.0.1-SNAPSHOT.jar
   skip_cleanup: true
   on:
