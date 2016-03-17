@@ -27,7 +27,7 @@ public class DelayFilter implements ClientRequestFilter {
     }
 
     @Override
-    public void filter(ClientRequestContext requestContext) throws IOException {
+    public synchronized void filter(ClientRequestContext requestContext) throws IOException {
         while(lastCall+throttlePeriod> System.currentTimeMillis()){
             try {
                 Thread.sleep(100);
