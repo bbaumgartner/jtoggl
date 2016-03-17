@@ -1,9 +1,13 @@
 package ch.simas.jtoggl.domain;
 
 /**
- * Created by hpa on 17.3.16.
+ * Contract for having ID.
  */
 public interface WithId extends Cloneable {
+
+    /**
+     * @return Object unique identifier.
+     */
     Long getId();
 
     void setId(Long id);

@@ -1,13 +1,6 @@
 package ch.simas.jtoggl;
 
-import com.fasterxml.jackson.core.Base64Variant;
-import com.fasterxml.jackson.core.JsonLocation;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonStreamContext;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.core.*;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
@@ -24,7 +17,7 @@ import static org.testng.AssertJUnit.assertEquals;
 
 
 /**
- * Created by hpa on 5.3.16.
+ * Tests for Json Date deserializer.
  */
 public class CustomDateDeserializerTest {
 
@@ -51,12 +44,12 @@ public class CustomDateDeserializerTest {
         TimeZone gmt = TimeZone.getTimeZone("GMT+2");
         Calendar c = Calendar.getInstance(gmt);
         c.setTimeZone(gmt);
-        c.set(Calendar.ZONE_OFFSET,3*3600000);
+        c.set(Calendar.ZONE_OFFSET, 3 * 3600000);
         c.setTime(d);
         c.setTimeZone(gmt);
-        c=Calendar.getInstance();
-        c.set(Calendar.ZONE_OFFSET,5*3600000);
-        c.set(2016,1,24,13,24,56);
+        c = Calendar.getInstance();
+        c.set(Calendar.ZONE_OFFSET, 5 * 3600000);
+        c.set(2016, 1, 24, 13, 24, 56);
         //  c.set(Calendar.ZONE_OFFSET,2*3600000);
 
         System.out.println(SIMPLE_DATE_FORMAT.format(c.getTime()));

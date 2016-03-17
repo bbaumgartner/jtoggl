@@ -18,18 +18,18 @@
  */
 package ch.simas.jtoggl.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
+ * Toggl representation of project <-> user mapping.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("user")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProjectUser implements Cloneable, WithWorkspace, WithUser ,WithId{
+public class ProjectUser implements Cloneable, WithWorkspace, WithUser, WithId {
 
     @JsonProperty("id")
     private Long id;
@@ -49,7 +49,6 @@ public class ProjectUser implements Cloneable, WithWorkspace, WithUser ,WithId{
 
     public ProjectUser() {
     }
-
 
     public Double getHourlyRate() {
         return hourlyRate;

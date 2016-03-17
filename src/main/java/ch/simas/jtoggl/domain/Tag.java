@@ -20,18 +20,18 @@
 package ch.simas.jtoggl.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
+ * Toggl Tag representation.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("tag")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Tag implements Cloneable, WithWorkspace,WithId {
+public class Tag implements Cloneable, WithWorkspace, WithId {
 
     @JsonProperty("id")
     private Long id;
@@ -44,7 +44,6 @@ public class Tag implements Cloneable, WithWorkspace,WithId {
 
     public Tag() {
     }
-
 
     public Long getId() {
         return id;

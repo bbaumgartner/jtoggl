@@ -31,6 +31,8 @@ import java.util.List;
 import static org.testng.Assert.*;
 
 /**
+ * Tests for JToggl.
+ *
  * @author Simon Martinelli
  */
 @Test

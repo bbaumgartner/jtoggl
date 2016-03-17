@@ -24,15 +24,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
+ * Toggl project representation.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("project")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Project implements Cloneable ,WithWorkspace,WithId{
+public class Project implements Cloneable, WithWorkspace, WithId {
 
     @JsonProperty("id")
     private Long id;

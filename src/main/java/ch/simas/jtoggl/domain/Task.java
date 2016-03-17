@@ -19,18 +19,18 @@
 package ch.simas.jtoggl.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
+ * Toggl Task representation. Only for purchased Toggl version.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("task")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Task implements Cloneable, WithWorkspace, WithUser, WithProject ,WithId{
+public class Task implements Cloneable, WithWorkspace, WithUser, WithProject, WithId {
 
     @JsonProperty("id")
     private Long id;

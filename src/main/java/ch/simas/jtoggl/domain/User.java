@@ -19,21 +19,19 @@
 package ch.simas.jtoggl.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 
 /**
+ * Toggl User representation.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("user")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class User  implements Cloneable,WithId {
+public class User implements Cloneable, WithId {
 
     @JsonProperty("id")
     private Long id;

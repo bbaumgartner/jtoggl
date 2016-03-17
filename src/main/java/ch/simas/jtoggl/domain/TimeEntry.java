@@ -20,7 +20,6 @@ package ch.simas.jtoggl.domain;
 
 import ch.simas.jtoggl.CustomDateDeserializer;
 import ch.simas.jtoggl.CustomDateSerializer;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -32,10 +31,11 @@ import java.util.List;
 
 
 /**
+ * Toggl time entry representation.
+ *
  * @author Simon Martinelli
  */
 @JsonRootName("time_entry")
-@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject {
 

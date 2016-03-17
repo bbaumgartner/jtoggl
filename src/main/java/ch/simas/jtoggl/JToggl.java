@@ -20,7 +20,9 @@ package ch.simas.jtoggl;
 
 import ch.simas.jtoggl.domain.*;
 import ch.simas.jtoggl.util.DelayFilter;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.hk2.api.Descriptor;
@@ -62,13 +64,22 @@ import java.util.logging.Logger;
  */
 public class JToggl {
 
+    /**
+     * Root URL for API.
+     */
     public static final String API_ROOT = "https://www.toggl.com/api";
+    /**
+     * API version.
+     */
     public static final int API_VERSION = 8;
+
+    /**
+     * Root URL with version.
+     */
     public static final String API_BASE = String.format("%s/v%d/", API_ROOT, API_VERSION);
 
-    public static final String DATA = "data";
-    public static final String PLACEHOLDER = "{0}";
-    public static final String SIMPLE_ID_PATH = "/" + PLACEHOLDER;
+    private static final String PLACEHOLDER = "{0}";
+    private static final String SIMPLE_ID_PATH = "/" + PLACEHOLDER;
 
     private final static String TIME_ENTRIES = API_BASE + "time_entries";
     private final static String TIME_ENTRY_BY_ID = TIME_ENTRIES + SIMPLE_ID_PATH;
@@ -102,7 +113,6 @@ public class JToggl {
     private boolean log = false;
     private long throttlePeriod = 0L;
     private Client client;
-    private Client multiClient;
 
     /**
      * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
@@ -164,7 +174,7 @@ public class JToggl {
     public TimeEntry getTimeEntry(Long id) {
 
         return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString()))
-                .get(new GenericType<DataWrapper<TimeEntry>>() {
+                .get(new GenericType<ResponseDataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -175,7 +185,7 @@ public class JToggl {
      */
     public TimeEntry getCurrentTimeEntry() {
         try {
-            return prepareRequest(TIME_ENTRY_CURRENT).get(new GenericType<DataWrapper<TimeEntry>>() {
+            return prepareRequest(TIME_ENTRY_CURRENT).get(new GenericType<ResponseDataWrapper<TimeEntry>>() {
             }).getData();
         } catch (ProcessingException e) {
             return null;
@@ -190,7 +200,7 @@ public class JToggl {
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
         return prepareRequest(TIME_ENTRIES)
-                .post(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                .post(Entity.json(stripe(timeEntry.clone())), new GenericType<ResponseDataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -203,7 +213,7 @@ public class JToggl {
     public TimeEntry startTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_START)
-                .post(Entity.json(stripe(timeEntry)), new GenericType<DataWrapper<TimeEntry>>() {
+                .post(Entity.json(stripe(timeEntry)), new GenericType<ResponseDataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -216,7 +226,7 @@ public class JToggl {
     public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<ResponseDataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -229,7 +239,7 @@ public class JToggl {
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<ResponseDataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -287,7 +297,7 @@ public class JToggl {
             clientObject.setWorkspaceId(clientObject.getWorkspace().getId());
         }
         clientObject.setWorkspace(null);
-        return prepareRequest(CLIENTS).post(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
+        return prepareRequest(CLIENTS).post(Entity.json(stripe(clientObject.clone())), new GenericType<ResponseDataWrapper<ProjectClient>>() {
         }).getData();
     }
 
@@ -327,7 +337,7 @@ public class JToggl {
     public ProjectClient updateClient(ProjectClient clientObject) {
 
         return prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString()))
-                .put(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
+                .put(Entity.json(stripe(clientObject.clone())), new GenericType<ResponseDataWrapper<ProjectClient>>() {
                 }).getData();
     }
 
@@ -372,7 +382,7 @@ public class JToggl {
      */
     public Project createProject(Project project) {
 
-        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), new GenericType<DataWrapper<Project>>() {
+        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), new GenericType<ResponseDataWrapper<Project>>() {
         }).getData();
     }
 
@@ -385,7 +395,7 @@ public class JToggl {
     public Project updateProject(Project project) {
 
         return prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString()))
-                .put(Entity.json(stripe(project.clone())), new GenericType<DataWrapper<Project>>() {
+                .put(Entity.json(stripe(project.clone())), new GenericType<ResponseDataWrapper<Project>>() {
                 }).getData();
     }
 
@@ -398,7 +408,7 @@ public class JToggl {
     public ProjectUser createProjectUser(ProjectUser projectUser) {
 
         return prepareRequest(PROJECT_USERS)
-                .post(Entity.json(stripe(projectUser.clone())), new GenericType<DataWrapper<ProjectUser>>() {
+                .post(Entity.json(stripe(projectUser.clone())), new GenericType<ResponseDataWrapper<ProjectUser>>() {
                 }).getData();
     }
 
@@ -431,7 +441,7 @@ public class JToggl {
     public Task createTask(Task task) {
 
         return prepareRequest(TASKS)
-                .post(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
+                .post(Entity.json(stripe(task.clone())), new GenericType<ResponseDataWrapper<Task>>() {
                 }).getData();
     }
 
@@ -444,7 +454,7 @@ public class JToggl {
     public Task updateTask(Task task) {
 
         return prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString()))
-                .put(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
+                .put(Entity.json(stripe(task.clone())), new GenericType<ResponseDataWrapper<Task>>() {
                 }).getData();
     }
 
@@ -465,7 +475,7 @@ public class JToggl {
      * @return current user {@link User}
      */
     public User getCurrentUser() {
-        return prepareRequest(GET_CURRENT_USER).get(new GenericType<DataWrapper<User>>() {
+        return prepareRequest(GET_CURRENT_USER).get(new GenericType<ResponseDataWrapper<User>>() {
         }).getData();
     }
 
@@ -561,7 +571,12 @@ public class JToggl {
         this.log = false;
     }
 
-    protected Client prepareMonoClient() {
+    /**
+     * Prepares instance of API client and returns it's instance. If client already created, existing instance is returned.
+     *
+     * @return Instance of API client.
+     */
+    protected Client prepareApiClient() {
         if (client == null) {
             ClientConfig clientConfig = new ClientConfig();
             clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
@@ -582,6 +597,9 @@ public class JToggl {
         return client;
     }
 
+    /**
+     * Json serialize/deserialize configuration.
+     */
     @Provider
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -594,39 +612,11 @@ public class JToggl {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
             mapper.disable(DeserializationFeature.UNWRAP_ROOT_VALUE);
-
-            DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
             mapper.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
                     .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
                     .disable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
                     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             ;
-            //   mapper.setConfig(deserializationConfig.withRootName("")
-            //         .with(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-            //       .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
-            //deserializationConfig.with(DeserializationFeature.UNWRAP_ROOT_VALUE);
-
-        }
-
-        @Override
-        public ObjectMapper getContext(Class<?> arg0) {
-            return mapper;
-        }
-
-    }
-
-    @Provider
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public static class JacksonMultiConfigurator extends JacksonJsonProvider implements ContextResolver<ObjectMapper> {
-
-        private ObjectMapper mapper = new ObjectMapper();
-
-        public JacksonMultiConfigurator() {
-
-            SerializationConfig serConfig = mapper.getSerializationConfig();
-            mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-            mapper.disable(DeserializationFeature.UNWRAP_ROOT_VALUE);
 
         }
 
@@ -647,7 +637,7 @@ public class JToggl {
 
     private Invocation.Builder prepareRequest(String url, Map<String, String> params) {
 
-        WebTarget target = prepareMonoClient().target(url);
+        WebTarget target = prepareApiClient().target(url);
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 target = target.queryParam(entry.getKey(), entry.getValue());
@@ -661,6 +651,10 @@ public class JToggl {
         return prepareRequest(url, null);
     }
 
+    /**
+     * Hack feature to allow use Jersey on Android.
+     * On android, register this feature to new client.
+     */
     public static class AndroidFriendlyFeature implements Feature {
 
         @Override

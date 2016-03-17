@@ -10,7 +10,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import java.io.IOException;
 
 /**
- * Created by hpa on 5.3.16.
+ * Json deserializer for ISO 8601 formatted dates.
  */
 public class CustomDateDeserializer extends JsonDeserializer<DateTime> {
     @Override
