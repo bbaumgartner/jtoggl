@@ -18,6 +18,6 @@ deploy:
       overwrite: true
       skip_cleanup: true
       api_key: $GITHUB_TOKEN
-      file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-jackson-*.jar
+      file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-8.0.0.jar
       on:
          tags: true

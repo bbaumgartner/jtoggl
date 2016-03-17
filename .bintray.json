@@ -52,7 +52,7 @@
 
   "files": [
     {
-      "includePattern": ".*/build/libs/(jtoggl-(.*)\\.(jar|pom))",
+      "includePattern": "/home/travis/build/konikvranik/jtoggl/build/libs/(jtoggl-(.*)\\.(jar|pom))",
       "excludePattern": ".*/do-not-deploy/.*",
       "uploadPattern": "maven/ch/simas/jtoggl/jtoggl/$2/$1.$3"
     }
