@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/konikvranik/jtoggl.svg?branch=master)](https://travis-ci.org/konikvranik/jtoggl) [![codecov.io](https://codecov.io/github/konikvranik/jtoggl/coverage.svg?branch=master)](https://codecov.io/github/konikvranik/jtoggl?branch=master)
+[![Build Status](https://travis-ci.org/konikvranik/jtoggl.svg?branch=master)](https://travis-ci.org/konikvranik/jtoggl) [![codecov.io](https://codecov.io/github/konikvranik/jtoggl/coverage.svg?branch=master)](https://codecov.io/github/konikvranik/jtoggl?branch=master) ![Download](https://api.bintray.com/packages/konikvranik/maven/jtoggl/images/download.svg) ](https://bintray.com/konikvranik/maven/jtoggl/_latestVersion)
 ----
 <h1>What is it about?</h1>
 
