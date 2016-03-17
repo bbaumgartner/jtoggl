@@ -372,7 +372,8 @@ public class JToggl {
      */
     public Project createProject(Project project) {
 
-        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), Project.class);
+        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), new GenericType<DataWrapper<Project>>() {
+        }).getData();
     }
 
     /**
