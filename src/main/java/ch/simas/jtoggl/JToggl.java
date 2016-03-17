@@ -18,19 +18,10 @@
  */
 package ch.simas.jtoggl;
 
-import ch.simas.jtoggl.domain.Project;
-import ch.simas.jtoggl.domain.ProjectClient;
-import ch.simas.jtoggl.domain.ProjectUser;
-import ch.simas.jtoggl.domain.Task;
-import ch.simas.jtoggl.domain.TimeEntry;
-import ch.simas.jtoggl.domain.User;
-import ch.simas.jtoggl.domain.Workspace;
-import ch.simas.jtoggl.domain.request.RequestClient;
-import ch.simas.jtoggl.domain.request.RequestProject;
-import ch.simas.jtoggl.domain.request.RequestProjectUser;
-import ch.simas.jtoggl.domain.request.RequestTask;
-import ch.simas.jtoggl.domain.request.RequestTimeEntry;
+import ch.simas.jtoggl.domain.*;
 import ch.simas.jtoggl.util.DelayFilter;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.glassfish.hk2.api.Descriptor;
 import org.glassfish.hk2.api.Filter;
@@ -45,6 +36,9 @@ import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.format.ISODateTimeFormat;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.Produces;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -53,7 +47,8 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -107,6 +102,7 @@ public class JToggl {
     private boolean log = false;
     private long throttlePeriod = 0L;
     private Client client;
+    private Client multiClient;
 
     /**
      * Constructor to create an instance of JToggl that uses an api token to connect to toggl.
@@ -168,7 +164,8 @@ public class JToggl {
     public TimeEntry getTimeEntry(Long id) {
 
         return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString()))
-                .get(TimeEntry.class).getData();
+                .get(new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -177,9 +174,12 @@ public class JToggl {
      * @return The running time entry or null if none
      */
     public TimeEntry getCurrentTimeEntry() {
-
-        return prepareRequest(TIME_ENTRY_CURRENT)
-                .get(TimeEntry.class).getData();
+        try {
+            return prepareRequest(TIME_ENTRY_CURRENT).get(new GenericType<DataWrapper<TimeEntry>>() {
+            }).getData();
+        } catch (ProcessingException e) {
+            return null;
+        }
     }
 
     /**
@@ -190,7 +190,8 @@ public class JToggl {
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
         return prepareRequest(TIME_ENTRIES)
-                .post(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
+                .post(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -201,12 +202,9 @@ public class JToggl {
      */
     public TimeEntry startTimeEntry(TimeEntry timeEntry) {
 
-        RequestTimeEntry entity = new RequestTimeEntry(timeEntry);
-
-        Response r = prepareRequest(TIME_ENTRY_START)
-                .post(Entity.json(entity));
         return prepareRequest(TIME_ENTRY_START)
-                .post(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
+                .post(Entity.json(stripe(timeEntry)), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -218,7 +216,8 @@ public class JToggl {
     public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -230,7 +229,8 @@ public class JToggl {
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(new RequestTimeEntry(timeEntry)), TimeEntry.class).getData();
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -240,8 +240,7 @@ public class JToggl {
      */
     public void destroyTimeEntry(Long id) {
 
-        prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString()))
-                .delete();
+        prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString())).delete();
     }
 
     /**
@@ -250,8 +249,7 @@ public class JToggl {
      * @param id
      */
     public void destroyProject(Long id) {
-        prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, id.toString()))
-                .delete();
+        prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, id.toString())).delete();
     }
 
 
@@ -262,15 +260,8 @@ public class JToggl {
      */
     public List<Workspace> getWorkspaces() {
 
-        Invocation.Builder request = prepareRequest(WORKSPACES);
-        Response response = request.get();
-        List<Workspace> workspaces = response.readEntity(new GenericType<List<Workspace>>() {
+        return prepareRequest(WORKSPACES).get(new GenericType<List<Workspace>>() {
         });
-        /*List<Workspace> workspaces = request
-                .get(new GenericType<List<Workspace>>() {
-                });
-                */
-        return workspaces;
     }
 
     /**
@@ -280,9 +271,8 @@ public class JToggl {
      */
     public List<ProjectClient> getClients() {
 
-        return prepareRequest(CLIENTS)
-                .get(new GenericType<List<ProjectClient>>() {
-                });
+        return prepareRequest(CLIENTS).get(new GenericType<List<ProjectClient>>() {
+        });
     }
 
     /**
@@ -291,10 +281,41 @@ public class JToggl {
      * @param clientObject
      * @return created {@link ProjectClient}
      */
-    public ProjectClient createClient(final ProjectClient clientObject) {
+    public ProjectClient createClient(ProjectClient clientObject) {
+        clientObject = clientObject.clone();
+        if (clientObject.getWorkspace() != null) {
+            clientObject.setWorkspaceId(clientObject.getWorkspace().getId());
+        }
+        clientObject.setWorkspace(null);
+        return prepareRequest(CLIENTS).post(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
+        }).getData();
+    }
 
-        return prepareRequest(CLIENTS)
-                .post(Entity.json(new RequestClient(clientObject)), ProjectClient.class).getData();
+    private static <T extends Cloneable & WithId> T stripe(T clientObject) {
+        if (clientObject instanceof WithWorkspace) {
+            WithWorkspace ww = (WithWorkspace) clientObject;
+            if (((WithWorkspace) clientObject).getWorkspaceId() == null && ((WithWorkspace) clientObject).getWorkspace() != null) {
+                ww.setWorkspaceId(ww.getWorkspace().getId());
+            }
+            ww.setWorkspace(null);
+
+
+        }
+        if (clientObject instanceof WithProject) {
+            WithProject wp = (WithProject) clientObject;
+            if (((WithProject) clientObject).getProjectId() == null && ((WithProject) clientObject).getProject() != null) {
+                wp.setProjectId(wp.getProject().getId());
+            }
+            wp.setProject(null);
+        }
+        if (clientObject instanceof WithUser) {
+            WithUser wu = (WithUser) clientObject;
+            if (((WithUser) clientObject).getUserId() == null && ((WithUser) clientObject).getUser() != null) {
+                wu.setUserId(wu.getUser().getId());
+            }
+            wu.setUser(null);
+        }
+        return clientObject;
     }
 
     /**
@@ -306,7 +327,8 @@ public class JToggl {
     public ProjectClient updateClient(ProjectClient clientObject) {
 
         return prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString()))
-                .put(Entity.json(new RequestClient(clientObject)), ProjectClient.class).getData();
+                .put(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
+                }).getData();
     }
 
     /**
@@ -350,7 +372,7 @@ public class JToggl {
      */
     public Project createProject(Project project) {
 
-        return prepareRequest(PROJECTS).post(Entity.json(new RequestProject(project)), Project.class).getData();
+        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), Project.class);
     }
 
     /**
@@ -362,7 +384,8 @@ public class JToggl {
     public Project updateProject(Project project) {
 
         return prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString()))
-                .put(Entity.json(new RequestProject(project)), Project.class).getData();
+                .put(Entity.json(stripe(project.clone())), new GenericType<DataWrapper<Project>>() {
+                }).getData();
     }
 
     /**
@@ -374,7 +397,8 @@ public class JToggl {
     public ProjectUser createProjectUser(ProjectUser projectUser) {
 
         return prepareRequest(PROJECT_USERS)
-                .post(Entity.json(new RequestProjectUser(projectUser)), ProjectUser.class).getData();
+                .post(Entity.json(stripe(projectUser.clone())), new GenericType<DataWrapper<ProjectUser>>() {
+                }).getData();
     }
 
     /**
@@ -406,7 +430,8 @@ public class JToggl {
     public Task createTask(Task task) {
 
         return prepareRequest(TASKS)
-                .post(Entity.json(new RequestTask(task)), Task.class).getData();
+                .post(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
+                }).getData();
     }
 
     /**
@@ -418,7 +443,8 @@ public class JToggl {
     public Task updateTask(Task task) {
 
         return prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString()))
-                .put(Entity.json(new RequestTask(task)), Task.class).getData();
+                .put(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
+                }).getData();
     }
 
     /**
@@ -438,8 +464,8 @@ public class JToggl {
      * @return current user {@link User}
      */
     public User getCurrentUser() {
-        return prepareRequest(GET_CURRENT_USER)
-                .get(User.class).getData();
+        return prepareRequest(GET_CURRENT_USER).get(new GenericType<DataWrapper<User>>() {
+        }).getData();
     }
 
     /**
@@ -534,16 +560,16 @@ public class JToggl {
         this.log = false;
     }
 
-    protected Client prepareClient() {
+    protected Client prepareMonoClient() {
         if (client == null) {
             ClientConfig clientConfig = new ClientConfig();
             clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 30 * 1000);
             clientConfig.property(ClientProperties.READ_TIMEOUT, 30 * 1000);
-            // clientConfig.register(JacksonConfigurator.class);
             clientConfig.register(JacksonFeature.class);
 
             client = JerseyClientBuilder.createClient(clientConfig);
             client.register(HttpAuthenticationFeature.basic(user, password));
+            client.register(JacksonConfigurator.class);
             if (log) {
                 LoggingFilter loggingFilter = new LoggingFilter(Logger.getLogger(LoggingFilter.class.getName()), true);
                 client.register(loggingFilter);
@@ -554,20 +580,31 @@ public class JToggl {
         }
         return client;
     }
-/*
+
     @Provider
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public static class JacksonConfigurator  extends JacksonJsonProvider implements ContextResolver<ObjectMapper> {
+    public static class JacksonConfigurator extends JacksonJsonProvider implements ContextResolver<ObjectMapper> {
 
         private ObjectMapper mapper = new ObjectMapper();
 
         public JacksonConfigurator() {
-      //      SerializationConfig serConfig = mapper.getSerializationConfig();
-//            serConfig.with(OUTPUT_DATE_FORMAT);
-    //        DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
-  //          deserializationConfig.with(INPUT_DATE_FORMAT);
-            mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+            mapper.disable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+
+            DeserializationConfig deserializationConfig = mapper.getDeserializationConfig();
+            mapper.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+                    .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
+                    .disable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
+                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            ;
+            //   mapper.setConfig(deserializationConfig.withRootName("")
+            //         .with(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            //       .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES));
+            //deserializationConfig.with(DeserializationFeature.UNWRAP_ROOT_VALUE);
+
         }
 
         @Override
@@ -575,7 +612,29 @@ public class JToggl {
             return mapper;
         }
 
-    }*/
+    }
+
+    @Provider
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class JacksonMultiConfigurator extends JacksonJsonProvider implements ContextResolver<ObjectMapper> {
+
+        private ObjectMapper mapper = new ObjectMapper();
+
+        public JacksonMultiConfigurator() {
+
+            SerializationConfig serConfig = mapper.getSerializationConfig();
+            mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+            mapper.disable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+
+        }
+
+        @Override
+        public ObjectMapper getContext(Class<?> arg0) {
+            return mapper;
+        }
+
+    }
 
     public long getThrottlePeriod() {
         return throttlePeriod;
@@ -587,7 +646,7 @@ public class JToggl {
 
     private Invocation.Builder prepareRequest(String url, Map<String, String> params) {
 
-        WebTarget target = prepareClient().target(url);
+        WebTarget target = prepareMonoClient().target(url);
         if (params != null) {
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 target = target.queryParam(entry.getKey(), entry.getValue());
@@ -595,6 +654,7 @@ public class JToggl {
         }
         return target.request(MediaType.APPLICATION_JSON_TYPE);
     }
+
 
     private Invocation.Builder prepareRequest(String url) {
         return prepareRequest(url, null);

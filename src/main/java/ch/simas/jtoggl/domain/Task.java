@@ -22,16 +22,15 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("task")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Cloneable {
+public class Task implements Cloneable, WithWorkspace, WithUser, WithProject ,WithId{
 
     @JsonProperty("id")
     private Long id;
@@ -48,6 +47,7 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
     private Long projectId;
     @JsonProperty("wid")
     private Long workspaceId;
+    private Long userId;
 
     public Task() {
     }
@@ -84,10 +84,12 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
         this.name = name;
     }
 
+    @Override
     public Project getProject() {
         return project;
     }
 
+    @Override
     public void setProject(Project project) {
         this.project = project;
     }
@@ -98,6 +100,16 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public Long getUserId() {
+        return userId;
+    }
+
+    @Override
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Workspace getWorkspace() {
@@ -135,16 +147,6 @@ public class Task extends AbstractDataWrapper<Task> implements IData<Task>, Clon
         int hash = 7;
         hash = 31 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
-    }
-
-    @Override
-    public Task getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(Task data) {
-        super.setData(data);
     }
 
     @Override

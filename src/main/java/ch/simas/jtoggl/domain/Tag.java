@@ -23,16 +23,15 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("tag")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
+public class Tag implements Cloneable, WithWorkspace,WithId {
 
     @JsonProperty("id")
     private Long id;
@@ -41,6 +40,7 @@ public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
     private Workspace workspace;
     @JsonProperty("wid")
     private Long wid;
+    private Long workspaceId;
 
     public Tag() {
     }
@@ -70,6 +70,16 @@ public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
         this.workspace = workspace;
     }
 
+    @Override
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    @Override
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
 
     @Override
     public String toString() {
@@ -96,16 +106,6 @@ public class Tag extends AbstractDataWrapper<Tag> implements IData<Tag> {
         int hash = 3;
         hash = 97 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
-    }
-
-    @Override
-    public Tag getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(Tag data) {
-        super.setData(data);
     }
 
     public Long getWid() {

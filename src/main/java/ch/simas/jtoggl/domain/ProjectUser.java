@@ -21,16 +21,15 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("user")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IData<ProjectUser> {
+public class ProjectUser implements Cloneable, WithWorkspace, WithUser ,WithId{
 
     @JsonProperty("id")
     private Long id;
@@ -46,6 +45,7 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
     private Long userId;
     @JsonProperty("wid")
     private Long workspaceId;
+    private Workspace workspace;
 
     public ProjectUser() {
     }
@@ -83,10 +83,12 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
         this.project = project;
     }
 
+    @Override
     public User getUser() {
         return user;
     }
 
+    @Override
     public void setUser(User user) {
         this.user = user;
     }
@@ -120,16 +122,6 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
         return hash;
     }
 
-    @Override
-    public ProjectUser getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(ProjectUser data) {
-        super.setData(data);
-    }
-
     public Long getProjectId() {
         return projectId;
     }
@@ -138,10 +130,12 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
         this.projectId = projectId;
     }
 
+    @Override
     public Long getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(Long userId) {
         this.userId = userId;
     }
@@ -166,5 +160,15 @@ public class ProjectUser extends AbstractDataWrapper<ProjectUser> implements IDa
 
     public void setWorkspaceId(Long workspaceId) {
         this.workspaceId = workspaceId;
+    }
+
+    @Override
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    @Override
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 }
