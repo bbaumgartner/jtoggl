@@ -1,0 +1,86 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: "jacoco"
+
+version = '8.0.0-SNAPSHOT'
+group = 'ch.simas.jtoggl'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+dependencies {
+
+    def jerseyVersion = "2.22.2"
+    compile "org.glassfish.jersey.core:jersey-client:$jerseyVersion"
+    compile "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion"
+    compile 'joda-time:joda-time:2.9.2'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
+
+    testCompile 'org.testng:testng:6.9.10'
+
+}
+
+repositories {
+    jcenter()
+}
+
+test {
+    useTestNG()
+    testLogging.showStandardStreams = true
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            pom.withXml {
+                def node = asNode()
+                node.appendNode('url', 'http://code.google.com/p/jtoggl')
+                node.appendNode('name', 'jtoggl-api')
+                def scm = node.appendNode('scm')
+                scm.appendNode('developerConnection', 'scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api')
+                scm.appendNode('url', 'http://code.google.com/p/jtoggl')
+                def developers = node.appendNode('developers')
+                def developer = developers.appendNode('developer')
+                developer.appendNode('name', 'Simon Martinelli')
+                developer.appendNode('organization', 'simas GmbH')
+                developer.appendNode('email', 'sm@simas.ch')
+                developer = developers.appendNode('developer')
+                developer.appendNode('name', 'Petr Vraník')
+                developer.appendNode('organization', 'SuTeren')
+                developer.appendNode('email', 'petr@vranik.name')
+                def props = node.appendNode('properties')
+                props.appendNode('project.build.sourceEncoding', 'UTF-8')
+                props.appendNode('project.reporting.outputEncoding', 'UTF-8')
+
+            }
+        }
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+if (project.rootProject.file('local.properties').exists()) {
+    Properties buildProps = new Properties()
+    buildProps.load(project.rootProject.file('local.properties').newDataInputStream())
+    buildProps.each { prop ->
+        project.ext.set(prop.key, prop.value)
+    }
+}
+
+
+
+
+
+

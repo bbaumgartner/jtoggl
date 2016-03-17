@@ -1,0 +1,28 @@
+language: java
+
+jdk: oraclejdk7
+
+after_success: "bash <(curl -s https://codecov.io/bash)"
+
+before_deploy:
+    - pwd
+    - cd $HOME/.m2/repository && zip -r $HOME/m2repo.zip ch/simas/jtoggl
+    - find $TRAVIS_BUILD_DIR/build -type f
+
+deploy:
+    - provider: releases
+      overwrite: true
+      skip_cleanup: true
+      api_key: $GITHUB_TOKEN
+      file:
+          - $HOME/m2repo.zip
+          - $TRAVIS_BUILD_DIR/build/libs/jtoggl-jackson-2.0.1-SNAPSHOT.jar
+      on:
+         tags: true
+    - provider: bintray
+      skip_cleanup: true
+      file: "$TRAVIS_BUILD_DIR/.bintray.json"
+      user: "konikvranik"
+      key: "$BINTRAY_TOKEN"
+      on:
+          tags: true
