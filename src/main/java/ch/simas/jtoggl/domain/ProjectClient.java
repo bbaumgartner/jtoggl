@@ -21,16 +21,15 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement(name = "client")
+@JsonRootName("client")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements IData<ProjectClient>, Cloneable {
+public class ProjectClient implements Cloneable, WithWorkspace, WithId {
 
     @JsonProperty("id")
     private Long id;
@@ -90,10 +89,12 @@ public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements
         this.notes = notes;
     }
 
+    @Override
     public Workspace getWorkspace() {
         return workspace;
     }
 
+    @Override
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
@@ -127,17 +128,10 @@ public class ProjectClient extends AbstractDataWrapper<ProjectClient> implements
         return hash;
     }
 
-    @Override
-    public ProjectClient getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(ProjectClient data) {
-        super.setData(data);
-    }
-
     public Long getWorkspaceId() {
+        if (workspaceId == null && workspace != null) {
+            return workspace.getId();
+        }
         return workspaceId;
     }
 

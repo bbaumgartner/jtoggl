@@ -23,21 +23,21 @@ import ch.simas.jtoggl.CustomDateSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.joda.time.DateTime;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("time_entry")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<TimeEntry>, Cloneable {
+public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject {
 
     @JsonProperty("id")
     private Long id;
@@ -97,10 +97,12 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         this.duration = duration;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
@@ -148,10 +150,12 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         this.tags = tags;
     }
 
+    @Override
     public Workspace getWorkspace() {
         return workspace;
     }
 
+    @Override
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
         if (workspace != null) {
@@ -168,6 +172,9 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
     }
 
     public Long getWorkspaceId() {
+        if (workspaceId == null && workspace != null) {
+            return workspace.getId();
+        }
         return workspaceId;
     }
 
@@ -175,10 +182,15 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         this.workspaceId = workspaceId;
     }
 
+    @Override
     public Long getProjectId() {
+        if (projectId == null && project != null) {
+            return project.getId();
+        }
         return projectId;
     }
 
+    @Override
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
@@ -219,16 +231,6 @@ public class TimeEntry extends AbstractDataWrapper<TimeEntry> implements IData<T
         int hash = 3;
         hash = 79 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
-    }
-
-    @Override
-    public TimeEntry getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(TimeEntry data) {
-        super.setData(data);
     }
 
     @Override

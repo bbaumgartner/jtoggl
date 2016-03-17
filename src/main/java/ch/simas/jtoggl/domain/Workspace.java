@@ -22,16 +22,15 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("workspace")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Workspace extends AbstractDataWrapper<Workspace> implements IData<Workspace> {
+public class Workspace implements Cloneable, WithId {
 
     @JsonProperty("id")
     private Long id;
@@ -92,16 +91,6 @@ public class Workspace extends AbstractDataWrapper<Workspace> implements IData<W
         int hash = 3;
         hash = 83 * hash + (this.id != null ? this.id.hashCode() : 0);
         return hash;
-    }
-
-    @Override
-    public Workspace getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(Workspace data) {
-        super.setData(data);
     }
 
 }

@@ -22,16 +22,17 @@ package ch.simas.jtoggl.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Simon Martinelli
  */
-@XmlRootElement
+@JsonRootName("project")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Project extends AbstractDataWrapper<Project> implements IData<Project>, Cloneable {
+public class Project implements Cloneable ,WithWorkspace,WithId{
 
     @JsonProperty("id")
     private Long id;
@@ -79,10 +80,12 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
         this.clientId = clientId;
     }
 
+    @Override
     public Workspace getWorkspace() {
         return workspace;
     }
 
+    @Override
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
@@ -125,16 +128,6 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
     }
 
     @Override
-    public Project getData() {
-        return super.getData();
-    }
-
-    @Override
-    public void setData(Project data) {
-        super.setData(data);
-    }
-
-    @Override
     public Project clone() {
         Project pr = new Project();
         pr.id = id;
@@ -148,10 +141,15 @@ public class Project extends AbstractDataWrapper<Project> implements IData<Proje
         return pr;
     }
 
+    @Override
     public Long getWorkspaceId() {
+        if(workspaceId==null&&workspace!=null){
+            return workspace.getId();
+        }
         return workspaceId;
     }
 
+    @Override
     public void setWorkspaceId(Long workspaceId) {
         this.workspaceId = workspaceId;
     }

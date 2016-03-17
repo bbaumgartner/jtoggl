@@ -18,12 +18,7 @@
  */
 package ch.simas.jtoggl;
 
-import ch.simas.jtoggl.domain.Project;
-import ch.simas.jtoggl.domain.ProjectClient;
-import ch.simas.jtoggl.domain.Task;
-import ch.simas.jtoggl.domain.TimeEntry;
-import ch.simas.jtoggl.domain.User;
-import ch.simas.jtoggl.domain.Workspace;
+import ch.simas.jtoggl.domain.*;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.testng.Assert;
@@ -80,24 +75,11 @@ public class JTogglTest {
         jToggl.setThrottlePeriod(1100l);
         jToggl.switchLoggingOn();
 
-        User cu = jToggl.getCurrentUser();
-
-
-        List<Workspace> workspaces = jToggl.getWorkspaces();
-        assertTrue(workspaces.size() > 0);
-        workspace = workspaces.get(0);
-
-
-        client = createClient();
-        timeEntry = createTimeEntry();
-        project = createProject();
-        if (workspace.getPremium())
-            task = createTask();
-
-        TimeEntry current = jToggl.getCurrentTimeEntry();
-        if (current != null) {
-            jToggl.stopTimeEntry(current);
-        }
+        getWorkspaces();
+    TimeEntry current = jToggl.getCurrentTimeEntry();
+    if (current != null && current.getId() != null) {
+        jToggl.stopTimeEntry(current);
+    }
 
     }
 
@@ -116,7 +98,82 @@ public class JTogglTest {
             jToggl.destroyProject(project.getId());
     }
 
+
     @Test
+    public void createTimeEntry() throws Exception {
+        TimeEntry entry = new TimeEntry();
+        entry.setDuration(480);
+        entry.setBillable(true);
+        entry.setStart(DateTime.parse("2011-09-15T08:00:00"));
+        entry.setStop(DateTime.parse("2011-09-15T16:00:00"));
+        entry.setDescription("From JUnit Test");
+        entry.setCreatedWith("JUnit");
+
+        TimeEntry e = jToggl.createTimeEntry(entry);
+        assertNotNull(e);
+        assertNotNull(e.getId());
+
+        timeEntry = e;
+    }
+
+    @Test(dependsOnMethods = {"getWorkspaces"})
+    public void createClient() {
+        ProjectClient cl = new ProjectClient();
+        cl.setName("JUnit Client");
+        cl.setWorkspace(workspace);
+
+        List<ProjectClient> wc = jToggl.getWorkspaceClients(workspace.getId());
+        if (wc != null) {
+            for (ProjectClient c : wc) {
+                if ("JUnit Client".equals(c.getName())) {
+                    client = c;
+                    return;
+                }
+            }
+        }
+
+        cl = jToggl.createClient(cl);
+        assertNotNull(cl);
+
+        client = cl;
+    }
+
+    @Test(dependsOnMethods = {"createClient"})
+    public void createProject() {
+        List<Project> projects = jToggl.getProjects();
+        if (projects != null) {
+            for (Project project : projects) {
+                if ("JUnit Project".equals(project.getName())) {
+                    this.project = project;
+                    return;
+                }
+            }
+        }
+
+        project = new Project();
+        project.setName("JUnit Project");
+        project.setClientId(client.getId());
+
+        List<Workspace> ws = jToggl.getWorkspaces();
+        project.setWorkspace(ws.get(0));
+
+        project = jToggl.createProject(project);
+        assertNotNull(project);
+    }
+
+    @Test(dependsOnMethods = {"createProject"})
+    public void createTask() {
+        Task t = new Task();
+        t.setName("JUnit Task " + DateTime.now().toString());
+        t.setActive(true);
+        t.setProject(project);
+
+        t = jToggl.createTask(t);
+        assertNotNull(t);
+        task = t;
+    }
+
+    @Test(dependsOnMethods = "createTimeEntry")
     public void getTimeEntries() {
         List<TimeEntry> entries = jToggl.getTimeEntries();
 
@@ -127,14 +184,14 @@ public class JTogglTest {
         assertFalse(entries.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTimeEntry")
     public void getTimeEntriesWithRange() {
         List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.parse("2011-10-10"), LocalDate.parse("2011-10-10"));
 
         assertTrue(entries.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTimeEntry")
     public void getTimeEntriesWithRange2() {
         List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop()
                 .toLocalDate());
@@ -142,7 +199,7 @@ public class JTogglTest {
         assertTrue(!entries.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTimeEntry")
     public void getTimeEntry() {
         TimeEntry te = jToggl.getTimeEntry(timeEntry.getId());
 
@@ -156,7 +213,7 @@ public class JTogglTest {
         assertNull(te);
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTimeEntry")
     public void updateTimeEntry() {
         final String DESCRIPTION = "ABC";
 
@@ -164,10 +221,10 @@ public class JTogglTest {
         TimeEntry te = jToggl.updateTimeEntry(timeEntry);
 
         assertNotNull(te);
-        Assert.assertEquals(DESCRIPTION, te.getDescription());
+        Assert.assertEquals( te.getDescription(),DESCRIPTION);
     }
 
-    @Test
+    @Test(dependsOnMethods = "createProject")
     public void startStopTimeEntry() throws Exception {
         TimeEntry current = jToggl.getCurrentTimeEntry();
         Assert.assertNull(current);
@@ -203,37 +260,39 @@ public class JTogglTest {
     }
 
     @Test
-    public void getWorkspaces() {
+    public static void getWorkspaces() {
         List<Workspace> workspaces = jToggl.getWorkspaces();
 
         assertFalse(workspaces.isEmpty());
+        workspace = workspaces.get(0);
+
     }
 
-    @Test
+    @Test(dependsOnMethods = "createClient")
     public void getClients() {
         List<ProjectClient> clients = jToggl.getClients();
 
         assertFalse(clients.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createClient")
     public void updateClient() {
 
         client.setNotes("Making more notes for update! " + DateTime.now().toString());
         ProjectClient cl = jToggl.updateClient(client);
 
         assertNotNull(cl);
-        Assert.assertEquals(client.getNotes(), cl.getNotes());
+        Assert.assertEquals(cl.getNotes(), client.getNotes());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createProject")
     public void getProjects() {
         List<Project> projects = jToggl.getProjects();
 
         assertFalse(projects.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createProject")
     public void updateProject() {
         project.setBillable(true);
         Project pr = jToggl.updateProject(project);
@@ -249,7 +308,7 @@ public class JTogglTest {
         // TODO
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTask")
     public void getTasks() {
         boolean isPremium = false;
         List<Workspace> workspaces = jToggl.getWorkspaces();
@@ -262,7 +321,7 @@ public class JTogglTest {
         assertFalse(isPremium && tasks.isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createTask")
     public void updateTask() {
         if (task == null) return;
         task.setActive(false);
@@ -284,80 +343,11 @@ public class JTogglTest {
         Assert.assertTrue(!user.getTimezone().isEmpty());
     }
 
-    @Test
+    @Test(dependsOnMethods = "createProjectUser")
     public void getAllUsers() {
         List<User> users = jToggl.getUsers();
 
         Assert.assertTrue(!users.isEmpty());
     }
 
-    private static TimeEntry createTimeEntry() throws Exception {
-        TimeEntry entry = new TimeEntry();
-        entry.setDuration(480);
-        entry.setBillable(true);
-        entry.setStart(DateTime.parse("2011-09-15T08:00:00"));
-        entry.setStop(DateTime.parse("2011-09-15T16:00:00"));
-        entry.setDescription("From JUnit Test");
-        entry.setCreatedWith("JUnit");
-
-        entry = jToggl.createTimeEntry(entry);
-        assertNotNull(entry);
-
-        return entry;
-    }
-
-    private static ProjectClient createClient() {
-        ProjectClient cl = new ProjectClient();
-        cl.setName("JUnit Client");
-        cl.setWorkspace(workspace);
-
-        List<ProjectClient> wc = jToggl.getWorkspaceClients(workspace.getId());
-        if (wc != null) {
-            for (ProjectClient c : wc) {
-                if ("JUnit Client".equals(c.getName())) {
-                   return c;
-                }
-            }
-        }
-
-        cl = jToggl.createClient(cl);
-        assertNotNull(cl);
-
-        return cl;
-    }
-
-    private static Project createProject() {
-        List<Project> projects = jToggl.getProjects();
-        if (projects != null) {
-            for (Project project : projects) {
-                if ("JUnit Project".equals(project.getName())) {
-                    return project;
-                }
-            }
-        }
-
-        Project pr = new Project();
-        pr.setName("JUnit Project");
-        pr.setClientId(client.getId());
-
-        List<Workspace> ws = jToggl.getWorkspaces();
-        pr.setWorkspace(ws.get(0));
-
-        pr = jToggl.createProject(pr);
-        assertNotNull(pr);
-
-        return pr;
-    }
-
-    private static Task createTask() {
-        Task t = new Task();
-        t.setName("JUnit Task " + DateTime.now().toString());
-        t.setActive(true);
-        t.setProject(project);
-
-        t = jToggl.createTask(t);
-        assertNotNull(t);
-
-        return t;
-    }
 }
