@@ -143,9 +143,6 @@ public class Project implements Cloneable ,WithWorkspace,WithId{
 
     @Override
     public Long getWorkspaceId() {
-        if(workspaceId==null&&workspace!=null){
-            return workspace.getId();
-        }
         return workspaceId;
     }
 

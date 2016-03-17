@@ -132,9 +132,6 @@ public class ProjectUser implements Cloneable, WithWorkspace, WithUser ,WithId{
 
     @Override
     public Long getUserId() {
-        if(userId==null&&user!=null){
-            return user.getId();
-        }
         return userId;
     }
 
@@ -158,9 +155,6 @@ public class ProjectUser implements Cloneable, WithWorkspace, WithUser ,WithId{
     }
 
     public Long getWorkspaceId() {
-        if (workspaceId == null && workspace != null) {
-            return workspace.getId();
-        }
         return workspaceId;
     }
 

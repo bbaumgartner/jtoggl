@@ -72,9 +72,6 @@ public class Tag implements Cloneable, WithWorkspace,WithId {
 
     @Override
     public Long getWorkspaceId() {
-        if (workspaceId == null && workspace != null) {
-            return workspace.getId();
-        }
         return workspaceId;
     }
 

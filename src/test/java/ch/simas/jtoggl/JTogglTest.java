@@ -76,10 +76,10 @@ public class JTogglTest {
         jToggl.switchLoggingOn();
 
         getWorkspaces();
-    TimeEntry current = jToggl.getCurrentTimeEntry();
-    if (current != null && current.getId() != null) {
-        jToggl.stopTimeEntry(current);
-    }
+        TimeEntry current = jToggl.getCurrentTimeEntry();
+        if (current != null && current.getId() != null) {
+            jToggl.stopTimeEntry(current);
+        }
 
     }
 
@@ -94,7 +94,7 @@ public class JTogglTest {
         } catch (Exception e) {
             // Ignore because Task is only for paying customers
         }
-        if (project != null)
+        if (project != null && project.getId() != null)
             jToggl.destroyProject(project.getId());
     }
 
@@ -154,8 +154,7 @@ public class JTogglTest {
         project.setName("JUnit Project");
         project.setClientId(client.getId());
 
-        List<Workspace> ws = jToggl.getWorkspaces();
-        project.setWorkspace(ws.get(0));
+        project.setWorkspace(workspace);
 
         project = jToggl.createProject(project);
         assertNotNull(project);
@@ -163,6 +162,9 @@ public class JTogglTest {
 
     @Test(dependsOnMethods = {"createProject"})
     public void createTask() {
+        if (!workspace.getPremium()) {
+            return;
+        }
         Task t = new Task();
         t.setName("JUnit Task " + DateTime.now().toString());
         t.setActive(true);
@@ -221,7 +223,7 @@ public class JTogglTest {
         TimeEntry te = jToggl.updateTimeEntry(timeEntry);
 
         assertNotNull(te);
-        Assert.assertEquals( te.getDescription(),DESCRIPTION);
+        Assert.assertEquals(te.getDescription(), DESCRIPTION);
     }
 
     @Test(dependsOnMethods = "createProject")
@@ -235,9 +237,10 @@ public class JTogglTest {
         timeEntry.setDescription("ABCD");
         timeEntry.setCreatedWith("JToggl Unit Test");
 
-        TimeEntry te = jToggl.startTimeEntry(timeEntry);
-
+        TimeEntry te = null;
+        TimeEntry stoppedTe = null;
         try {
+            te = jToggl.startTimeEntry(timeEntry);
             assertNotNull(te.getId());//created
             Assert.assertTrue(te.getDuration() < 0);//running
 
@@ -247,7 +250,7 @@ public class JTogglTest {
 
             Thread.sleep(2000);
 
-            TimeEntry stoppedTe = jToggl.stopTimeEntry(te);
+            stoppedTe = jToggl.stopTimeEntry(te);
 
             assertEquals(te.getId(), stoppedTe.getId());
             assertTrue(stoppedTe.getDuration() > 1, stoppedTe.toString()); //stopped
@@ -255,7 +258,12 @@ public class JTogglTest {
             current = jToggl.getCurrentTimeEntry();
             Assert.assertNull(current);
         } finally {
-            jToggl.destroyTimeEntry(te.getId());
+            if (te != null && te.getId() != null) {
+                jToggl.destroyTimeEntry(te.getId());
+            }
+            if (stoppedTe != null && stoppedTe.getId() != null) {
+                jToggl.destroyTimeEntry(stoppedTe.getId());
+            }
         }
     }
 
@@ -310,6 +318,9 @@ public class JTogglTest {
 
     @Test(dependsOnMethods = "createTask")
     public void getTasks() {
+        if (!workspace.getPremium()) {
+            return;
+        }
         boolean isPremium = false;
         List<Workspace> workspaces = jToggl.getWorkspaces();
         if (!workspaces.isEmpty()) {
@@ -324,6 +335,9 @@ public class JTogglTest {
     @Test(dependsOnMethods = "createTask")
     public void updateTask() {
         if (task == null) return;
+        if (!workspace.getPremium()) {
+            return;
+        }
         task.setActive(false);
         try {
             Task t = jToggl.updateTask(task);

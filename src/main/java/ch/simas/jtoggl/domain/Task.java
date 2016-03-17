@@ -104,9 +104,6 @@ public class Task implements Cloneable, WithWorkspace, WithUser, WithProject ,Wi
 
     @Override
     public Long getUserId() {
-        if (userId == null && user != null) {
-            return user.getId();
-        }
         return userId;
     }
 
@@ -166,9 +163,6 @@ public class Task implements Cloneable, WithWorkspace, WithUser, WithProject ,Wi
     }
 
     public Long getProjectId() {
-        if (projectId == null && project != null) {
-            return project.getId();
-        }
         return projectId;
     }
 
@@ -177,9 +171,6 @@ public class Task implements Cloneable, WithWorkspace, WithUser, WithProject ,Wi
     }
 
     public Long getWorkspaceId() {
-        if (workspaceId == null && workspace != null) {
-            return workspace.getId();
-        }
         return workspaceId;
     }
 

@@ -190,7 +190,7 @@ public class JToggl {
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
         return prepareRequest(TIME_ENTRIES)
-                .post(Entity.json(timeEntry), new GenericType<DataWrapper<TimeEntry>>() {
+                .post(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -203,7 +203,8 @@ public class JToggl {
     public TimeEntry startTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_START)
-                .post(Entity.json(timeEntry), TimeEntry.class);
+                .post(Entity.json(stripe(timeEntry)), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -215,7 +216,8 @@ public class JToggl {
     public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(timeEntry), TimeEntry.class);
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
+                }).getData();
     }
 
     /**
@@ -227,7 +229,7 @@ public class JToggl {
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
 
         return prepareRequest(TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString()))
-                .put(Entity.json(timeEntry), new GenericType<DataWrapper<TimeEntry>>() {
+                .put(Entity.json(stripe(timeEntry.clone())), new GenericType<DataWrapper<TimeEntry>>() {
                 }).getData();
     }
 
@@ -285,8 +287,35 @@ public class JToggl {
             clientObject.setWorkspaceId(clientObject.getWorkspace().getId());
         }
         clientObject.setWorkspace(null);
-        return prepareRequest(CLIENTS).post(Entity.json(clientObject), new GenericType<DataWrapper<ProjectClient>>() {
+        return prepareRequest(CLIENTS).post(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
         }).getData();
+    }
+
+    private static <T extends Cloneable & WithId> T stripe(T clientObject) {
+        if (clientObject instanceof WithWorkspace) {
+            WithWorkspace ww = (WithWorkspace) clientObject;
+            if (((WithWorkspace) clientObject).getWorkspaceId() == null && ((WithWorkspace) clientObject).getWorkspace() != null) {
+                ww.setWorkspaceId(ww.getWorkspace().getId());
+            }
+            ww.setWorkspace(null);
+
+
+        }
+        if (clientObject instanceof WithProject) {
+            WithProject wp = (WithProject) clientObject;
+            if (((WithProject) clientObject).getProjectId() == null && ((WithProject) clientObject).getProject() != null) {
+                wp.setProjectId(wp.getProject().getId());
+            }
+            wp.setProject(null);
+        }
+        if (clientObject instanceof WithUser) {
+            WithUser wu = (WithUser) clientObject;
+            if (((WithUser) clientObject).getUserId() == null && ((WithUser) clientObject).getUser() != null) {
+                wu.setUserId(wu.getUser().getId());
+            }
+            wu.setUser(null);
+        }
+        return clientObject;
     }
 
     /**
@@ -298,7 +327,7 @@ public class JToggl {
     public ProjectClient updateClient(ProjectClient clientObject) {
 
         return prepareRequest(CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString()))
-                .put(Entity.json(clientObject), new GenericType<DataWrapper<ProjectClient>>() {
+                .put(Entity.json(stripe(clientObject.clone())), new GenericType<DataWrapper<ProjectClient>>() {
                 }).getData();
     }
 
@@ -343,7 +372,7 @@ public class JToggl {
      */
     public Project createProject(Project project) {
 
-        return prepareRequest(PROJECTS).post(Entity.json(project), Project.class);
+        return prepareRequest(PROJECTS).post(Entity.json(stripe(project.clone())), Project.class);
     }
 
     /**
@@ -355,7 +384,8 @@ public class JToggl {
     public Project updateProject(Project project) {
 
         return prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString()))
-                .put(Entity.json(project), Project.class);
+                .put(Entity.json(stripe(project.clone())), new GenericType<DataWrapper<Project>>() {
+                }).getData();
     }
 
     /**
@@ -367,7 +397,7 @@ public class JToggl {
     public ProjectUser createProjectUser(ProjectUser projectUser) {
 
         return prepareRequest(PROJECT_USERS)
-                .post(Entity.json(projectUser), new GenericType<DataWrapper<ProjectUser>>() {
+                .post(Entity.json(stripe(projectUser.clone())), new GenericType<DataWrapper<ProjectUser>>() {
                 }).getData();
     }
 
@@ -400,7 +430,7 @@ public class JToggl {
     public Task createTask(Task task) {
 
         return prepareRequest(TASKS)
-                .post(Entity.json(task), new GenericType<DataWrapper<Task>>() {
+                .post(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
                 }).getData();
     }
 
@@ -413,7 +443,7 @@ public class JToggl {
     public Task updateTask(Task task) {
 
         return prepareRequest(TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString()))
-                .put(Entity.json(task), new GenericType<DataWrapper<Task>>() {
+                .put(Entity.json(stripe(task.clone())), new GenericType<DataWrapper<Task>>() {
                 }).getData();
     }
 

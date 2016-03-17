@@ -121,9 +121,6 @@ public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject 
 
     public void setProject(Project project) {
         this.project = project;
-        if (project != null) {
-            this.projectId = project.getId();
-        }
     }
 
     public DateTime getStart() {
@@ -158,9 +155,6 @@ public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject 
     @Override
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
-        if (workspace != null) {
-            this.workspaceId = workspace.getId();
-        }
     }
 
     public String getCreatedWith() {
@@ -172,9 +166,6 @@ public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject 
     }
 
     public Long getWorkspaceId() {
-        if (workspaceId == null && workspace != null) {
-            return workspace.getId();
-        }
         return workspaceId;
     }
 
@@ -184,9 +175,6 @@ public class TimeEntry implements Cloneable, WithWorkspace, WithId, WithProject 
 
     @Override
     public Long getProjectId() {
-        if (projectId == null && project != null) {
-            return project.getId();
-        }
         return projectId;
     }
 

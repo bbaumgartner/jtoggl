@@ -129,9 +129,6 @@ public class ProjectClient implements Cloneable, WithWorkspace, WithId {
     }
 
     public Long getWorkspaceId() {
-        if (workspaceId == null && workspace != null) {
-            return workspace.getId();
-        }
         return workspaceId;
     }
 
