@@ -10,6 +10,7 @@ before_deploy:
     - cd $TRAVIS_BUILD_DIR && ./gradlew generatePomFileForMavenPublication
 deploy:
     - provider: bintray
+      overwrite: true
       skip_cleanup: true
       file: "$TRAVIS_BUILD_DIR/.bintray.json"
       user: "konikvranik"
