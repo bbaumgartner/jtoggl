@@ -7,14 +7,6 @@ script: ./gradlew test jacocoTestReport
 after_success: "bash <(curl -s https://codecov.io/bash)"
 
 deploy:
-    - provider: releases
-      overwrite: true
-      skip_cleanup: true
-      api_key: $GITHUB_TOKEN
-      file:
-          - $TRAVIS_BUILD_DIR/build/libs/jtoggl-jackson-2.0.1-SNAPSHOT.jar
-      on:
-         tags: true
     - provider: bintray
       skip_cleanup: true
       file: "$TRAVIS_BUILD_DIR/.bintray.json"
@@ -22,3 +14,10 @@ deploy:
       key: "$BINTRAY_TOKEN"
       on:
           tags: true
+    - provider: releases
+      overwrite: true
+      skip_cleanup: true
+      api_key: $GITHUB_TOKEN
+      file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-jackson-*.jar
+      on:
+         tags: true
