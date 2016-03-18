@@ -8,6 +8,7 @@ after_success: "bash <(curl -s https://codecov.io/bash)"
 
 before_deploy:
     - cd $TRAVIS_BUILD_DIR && ./gradlew generatePomFileForMavenPublication
+
 deploy:
     - provider: bintray
       overwrite: true
@@ -24,3 +25,5 @@ deploy:
       file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-8.0.0.jar
       on:
          tags: true
+- after_script:
+  - $TRAVIS_BUILD_DIR/scripts/pubreports.sh
