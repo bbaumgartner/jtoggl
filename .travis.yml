@@ -6,24 +6,23 @@ script: ./gradlew test jacocoTestReport
 
 after_success: "bash <(curl -s https://codecov.io/bash)"
 
-before_deploy:
-    - cd $TRAVIS_BUILD_DIR && ./gradlew generatePomFileForMavenPublication
+before_deploy: cd $TRAVIS_BUILD_DIR && ./gradlew generatePomFileForMavenPublication
 
 deploy:
-    - provider: bintray
-      overwrite: true
-      skip_cleanup: true
-      file: "$TRAVIS_BUILD_DIR/.bintray.json"
-      user: "konikvranik"
-      key: "$BINTRAY_TOKEN"
-      on:
-          tags: true
-    - provider: releases
-      overwrite: true
-      skip_cleanup: true
-      api_key: $GITHUB_TOKEN
-      file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-8.0.0.jar
-      on:
-         tags: true
-- after_script:
-  - $TRAVIS_BUILD_DIR/scripts/pubreports.sh
+  - provider: bintray
+    overwrite: true
+    skip_cleanup: true
+    file: "$TRAVIS_BUILD_DIR/.bintray.json"
+    user: "konikvranik"
+    key: "$BINTRAY_TOKEN"
+    on:
+        tags: true
+  - provider: releases
+    overwrite: true
+    skip_cleanup: true
+    api_key: $GITHUB_TOKEN
+    file: $TRAVIS_BUILD_DIR/build/libs/jtoggl-8.0.0.jar
+    on:
+       tags: true
+
+after_script:  $TRAVIS_BUILD_DIR/scripts/pubreports.sh
