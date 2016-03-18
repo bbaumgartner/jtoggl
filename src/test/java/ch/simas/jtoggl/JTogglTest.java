@@ -20,6 +20,8 @@ package ch.simas.jtoggl;
 
 import ch.simas.jtoggl.domain.*;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
 import org.joda.time.LocalDate;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -106,8 +108,8 @@ public class JTogglTest {
         TimeEntry entry = new TimeEntry();
         entry.setDuration(480);
         entry.setBillable(true);
-        entry.setStart(DateTime.parse("2011-09-15T08:00:00"));
-        entry.setStop(DateTime.parse("2011-09-15T16:00:00"));
+        entry.setStart(DateTime.now().minus(Days.FIVE).minus(Hours.FOUR));
+        entry.setStop(DateTime.now().minus(Days.FIVE));
         entry.setDescription("From JUnit Test");
         entry.setCreatedWith("JUnit");
 
@@ -177,7 +179,7 @@ public class JTogglTest {
         task = t;
     }
 
-    @Test(dependsOnMethods = "createTimeEntry")
+    @Test(dependsOnMethods = {"createTimeEntry", "startStopTimeEntry"})
     public void getTimeEntries() {
         List<TimeEntry> entries = jToggl.getTimeEntries();
 
@@ -190,9 +192,10 @@ public class JTogglTest {
 
     @Test(dependsOnMethods = "createTimeEntry")
     public void getTimeEntriesWithRange() {
-        List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.parse("2011-10-10"), LocalDate.parse("2011-10-10"));
+        List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.now().minus(Days.FIVE).minus(Hours.EIGHT),
+                LocalDate.now().minus(Days.FIVE).plus(Hours.ONE));
 
-        assertTrue(entries.isEmpty());
+        assertFalse(entries.isEmpty());
     }
 
     @Test(dependsOnMethods = "createTimeEntry")
@@ -200,7 +203,15 @@ public class JTogglTest {
         List<TimeEntry> entries = jToggl.getTimeEntries(timeEntry.getStart().toLocalDate(), timeEntry.getStop()
                 .toLocalDate());
 
-        assertTrue(!entries.isEmpty());
+        assertFalse(entries.isEmpty());
+    }
+
+    @Test(dependsOnMethods = "createTimeEntry")
+    public void getTimeEntriesWithRange3() {
+        List<TimeEntry> entries = jToggl.getTimeEntries(LocalDate.now().minus(Days.ONE).minus(Hours.ONE),
+                LocalDate.now().minus(Days.ONE));
+
+        assertTrue(entries.isEmpty());
     }
 
     @Test(dependsOnMethods = "createTimeEntry")
