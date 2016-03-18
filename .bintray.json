@@ -54,12 +54,12 @@
     {
       "includePattern": "/home/travis/build/konikvranik/jtoggl/build/libs/(jtoggl-(.*)\\.(jar|pom))",
       "excludePattern": ".*/do-not-deploy/.*",
-      "uploadPattern": "maven/ch/simas/jtoggl/jtoggl/$2/$1"
+      "uploadPattern": "ch/simas/jtoggl/jtoggl/$2/$1"
     },
     {
       "includePattern": "/home/travis/build/konikvranik/jtoggl/build/publications/maven/pom-default.xml",
       "excludePattern": ".*/do-not-deploy/.*",
-      "uploadPattern": "maven/ch/simas/jtoggl/jtoggl/8.0.0/jtoggl-8.0.0.pom"
+      "uploadPattern": "ch/simas/jtoggl/jtoggl/8.0.0/jtoggl-8.0.0.pom"
     }
   ],
   "publish": true
