@@ -150,8 +150,8 @@ public class JToggl {
      * which time entries to return but you can specify another date range using
      * start_date and end_date parameters.
      *
-     * @param startDate
-     * @param endDate
+     * @param startDate Date to retrieve time entries from.
+     * @param endDate   Date to retrieve time entries to.
      * @return list of {@link TimeEntry}
      */
     public List<TimeEntry> getTimeEntries(LocalDate startDate, LocalDate endDate) {
@@ -168,7 +168,7 @@ public class JToggl {
     /**
      * Get a time entry.
      *
-     * @param id
+     * @param id ID of time entry to retrieve.
      * @return TimeEntry or null if no Entry is found.
      */
     public TimeEntry getTimeEntry(Long id) {
@@ -195,7 +195,7 @@ public class JToggl {
     /**
      * Create a new time entry.
      *
-     * @param timeEntry
+     * @param timeEntry Dafa for creation new time entry.
      * @return created {@link TimeEntry}
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
@@ -233,7 +233,7 @@ public class JToggl {
     /**
      * Update a time entry.
      *
-     * @param timeEntry
+     * @param timeEntry Data for updating existing time entry.
      * @return created {@link TimeEntry}
      */
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
@@ -246,7 +246,7 @@ public class JToggl {
     /**
      * Destroy a time entry.
      *
-     * @param id
+     * @param id ID of time entry to delete.
      */
     public void destroyTimeEntry(Long id) {
 
@@ -256,7 +256,7 @@ public class JToggl {
     /**
      * Destroy a project.
      *
-     * @param id
+     * @param id ID of project to delete.
      */
     public void destroyProject(Long id) {
         prepareRequest(PROJECT_BY_ID.replace(PLACEHOLDER, id.toString())).delete();
@@ -288,7 +288,7 @@ public class JToggl {
     /**
      * Create a new client.
      *
-     * @param clientObject
+     * @param clientObject Data for creation new client.
      * @return created {@link ProjectClient}
      */
     public ProjectClient createClient(ProjectClient clientObject) {
@@ -331,7 +331,7 @@ public class JToggl {
     /**
      * Update a client.
      *
-     * @param clientObject
+     * @param clientObject Data for updating existing client.
      * @return updated {@link ProjectClient}
      */
     public ProjectClient updateClient(ProjectClient clientObject) {
@@ -344,7 +344,7 @@ public class JToggl {
     /**
      * Destroy a client.
      *
-     * @param id
+     * @param id ID of client to be deleted.
      */
     public void destroyClient(Long id) {
 
@@ -377,7 +377,7 @@ public class JToggl {
     /**
      * Create a new project.
      *
-     * @param project
+     * @param project Data for creation of new project.
      * @return created {@link Project}
      */
     public Project createProject(Project project) {
@@ -389,7 +389,7 @@ public class JToggl {
     /**
      * Update a project.
      *
-     * @param project
+     * @param project Data for updating existing project.
      * @return updated {@link Project}
      */
     public Project updateProject(Project project) {
@@ -402,7 +402,7 @@ public class JToggl {
     /**
      * Create a new project user.
      *
-     * @param projectUser
+     * @param projectUser Data for creation of new user.
      * @return created {@link ProjectUser}
      */
     public ProjectUser createProjectUser(ProjectUser projectUser) {
@@ -435,7 +435,7 @@ public class JToggl {
     /**
      * Create a new task.
      *
-     * @param task
+     * @param task Data for creation of new task.
      * @return created {@link Task}
      */
     public Task createTask(Task task) {
@@ -448,7 +448,7 @@ public class JToggl {
     /**
      * Update a task.
      *
-     * @param task
+     * @param task Data for updating of existing task.
      * @return updated {@link Task}
      */
     public Task updateTask(Task task) {
@@ -461,7 +461,7 @@ public class JToggl {
     /**
      * Destroy a task.
      *
-     * @param id
+     * @param id ID of task to be deleted.
      */
     public void destroyTask(Long id) {
 

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
- * Toggl representation of project <-> user mapping.
+ * Toggl representation of project / user mapping.
  *
  * @author Simon Martinelli
  */
