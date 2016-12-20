@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/konikvranik/jtoggl.svg?branch=master)](https://travis-ci.org/konikvranik/jtoggl) [ ![Codeship Status for konikvranik/jtoggl](https://codeship.com/projects/0e0c0050-d308-0133-5da2-5e07c373472b/status?branch=master)](https://codeship.com/projects/141996) [![codecov.io](https://codecov.io/github/konikvranik/jtoggl/coverage.svg?branch=master)](https://codecov.io/github/konikvranik/jtoggl?branch=master) [![Issue Count](https://codeclimate.com/github/konikvranik/jtoggl/badges/issue_count.svg)](https://codeclimate.com/github/konikvranik/jtoggl) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/4ec4d485b6884f76a74d5799c08d14dc/badge.svg)](https://www.quantifiedcode.com/app/project/4ec4d485b6884f76a74d5799c08d14dc) [![Download](https://api.bintray.com/packages/konikvranik/maven/jtoggl/images/download.svg)](https://bintray.com/konikvranik/maven/jtoggl/_latestVersion)
+----
 <h1>What is it about?</h1>
 
 jtoggl wraps the Toggl REST/JSON API for Java. 
