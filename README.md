@@ -5,6 +5,8 @@ https://www.toggl.com/public/api
 
 <h1>Get it!</h1>
 
+Please have a look at the fork https://github.com/konikvranik/jtoggl which might contain a more suitable solution for you.
+
 <h2>I use Maven</h2>
 You can find jtoggl-api in our Maven repository
 
