@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2011 by simas GmbH, Moosentli 7, 3235 Erlach, Switzerland
  * http://www.simas.ch
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 /**
- * 
+ *
  * @author Simon Martinelli
  */
 public class Task {
@@ -31,9 +31,8 @@ public class Task {
     private String name;
     private Long estimated_seconds;
     private Boolean is_active;
-    private Workspace workspace;
-    private Project project;
-    private User user;
+    private Long wid;
+    private Long pid;
 
     public Task() {
     }
@@ -44,19 +43,8 @@ public class Task {
         this.name = (String) object.get("name");
         this.estimated_seconds = (Long) object.get("estimated_seconds");
         this.is_active = (Boolean) object.get("active");
-
-        JSONObject workspaceObject = (JSONObject) object.get("workspace");
-        if (workspaceObject != null) {
-            this.workspace = new Workspace(workspaceObject.toJSONString());
-        }
-        JSONObject projectObject = (JSONObject) object.get("project");
-        if (projectObject != null) {
-            this.project = new Project(projectObject.toJSONString());
-        }
-        JSONObject userObject = (JSONObject) object.get("user");
-        if (userObject != null) {
-            this.user = new User(userObject.toJSONString());
-        }
+        this.wid = (Long) object.get("wid");
+        this.pid = (Long) object.get("pid");
     }
 
     public Long getEstimated_seconds() {
@@ -91,28 +79,20 @@ public class Task {
         this.name = name;
     }
 
-    public Project getProject() {
-        return project;
+    public Long getWid() {
+        return wid;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setWid(Long wid) {
+        this.wid = wid;
     }
 
-    public User getUser() {
-        return user;
+    public Long getPid() {
+        return pid;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
+    public void setPid(Long pid) {
+        this.pid = pid;
     }
 
     public JSONObject toJSONObject() {
@@ -129,18 +109,11 @@ public class Task {
         if (is_active != null) {
             object.put("active", is_active);
         }
-
-        if (workspace != null) {
-            object.put("workspace", this.workspace.toJSONObject());
-            object.put("wid", this.workspace.getId());
+        if (wid != null) {
+            object.put("wid", wid);
         }
-        if (project != null) {
-            object.put("project", this.project.toJSONObject());
-            object.put("pid", this.project.getId());
-        }
-        if (user != null) {
-            object.put("user", this.user.toJSONObject());
-            object.put("uid", this.user.getId());
+        if (pid != null) {
+            object.put("pid", pid);
         }
 
         return object;
@@ -152,7 +125,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" + "id=" + id + ", name=" + name + ", estimated_seconds=" + estimated_seconds + ", is_active=" + is_active + ", workspace=" + workspace + ", project=" + project + ", user=" + user + '}';
+        return "Task{" + "id=" + id + ", name=" + name + ", estimated_seconds=" + estimated_seconds + ", is_active=" + is_active + ", wid=" + wid + ", pid=" + pid + '}';
     }
 
     @Override
