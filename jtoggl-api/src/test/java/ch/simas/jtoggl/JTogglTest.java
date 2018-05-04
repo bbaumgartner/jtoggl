@@ -267,7 +267,7 @@ public class JTogglTest {
 
     private static Client createClient() {
         Client cl = new Client();
-        cl.setName("JUnit Client");
+        cl.setName("JUnit Client 2");
         cl.setWorkspace(workspace);
 
         cl = jToggl.createClient(cl);

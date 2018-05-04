@@ -18,29 +18,29 @@
  */
 package ch.simas.jtoggl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-
+import org.apache.http.params.CoreConnectionPNames;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import ch.simas.jtoggl.util.DateUtil;
-import ch.simas.jtoggl.util.DelayFilter;
+import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  * API Class for Toggl REST API.
@@ -130,16 +130,12 @@ public class JToggl {
      * @return list of {@link TimeEntry}
      */
     public List<TimeEntry> getTimeEntries(Date startDate, Date endDate) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TIME_ENTRIES);
-
+        HashMap<String,String> queryParams = new HashMap<>();
         if (startDate != null && endDate != null) {
-            MultivaluedMap<String,String> queryParams = new MultivaluedMapImpl();
-            queryParams.add("start_date", DateUtil.convertDateToString(startDate));
-            queryParams.add("end_date", DateUtil.convertDateToString(endDate));
-            webResource = webResource.queryParams(queryParams);
+            queryParams.put("start_date", DateUtil.convertDateToString(startDate));
+            queryParams.put("end_date", DateUtil.convertDateToString(endDate));
         }
-        String response = webResource.get(String.class);
+        String response = fetch(TIME_ENTRIES, queryParams);
         JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<TimeEntry> entries = new ArrayList<TimeEntry>();
@@ -159,16 +155,9 @@ public class JToggl {
      * @return TimeEntry or null if no Entry is found.
      */
     public TimeEntry getTimeEntry(Long id) {
-        Client client = prepareClient();
         String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebResource webResource = client.resource(url);
 
-        String response = null;
-        try {
-            response = webResource.get(String.class);
-        } catch (UniformInterfaceException uniformInterfaceException) {
-            return null;
-        }
+        String response = fetch(url);
 
         JSONObject object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -184,17 +173,9 @@ public class JToggl {
 	 * @return The running time entry or null if none
 	 */
 	public TimeEntry getCurrentTimeEntry() {
-		Client client = prepareClient();
-		WebResource webResource = client.resource(TIME_ENTRY_CURRENT);
+		String response = fetch(TIME_ENTRY_CURRENT);
 
-		String response = null;
-		try {
-			response = webResource.get(String.class);
-		} catch (UniformInterfaceException uniformInterfaceException) {
-			return null;
-		}
-
-		JSONObject object = (JSONObject) JSONValue.parse(response);
+        JSONObject object = (JSONObject) JSONValue.parse(response);
 		JSONObject data = (JSONObject) object.get(DATA);
 		if (data == null)
 			return null;
@@ -209,12 +190,9 @@ public class JToggl {
      * @return created {@link TimeEntry}
      */
     public TimeEntry createTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TIME_ENTRIES);
 
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String response = post(object, TIME_ENTRIES);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -229,12 +207,8 @@ public class JToggl {
 	 * @return created {@link TimeEntry}
 	 */
     public TimeEntry startTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TIME_ENTRY_START);
-
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String response = post(object, TIME_ENTRY_START);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -249,13 +223,10 @@ public class JToggl {
 	 * @return the stopped {@link TimeEntry}
 	 */
     public TimeEntry stopTimeEntry(TimeEntry timeEntry) {
-    	Client client = prepareClient();
         String url = TIME_ENTRY_STOP.replace(PLACEHOLDER, timeEntry.getId().toString());
-        WebResource webResource = client.resource(url);
 
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+        String response = getClient().body(object.toJSONString()).put(url).body().asString();
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -269,13 +240,10 @@ public class JToggl {
      * @return created {@link TimeEntry}
      */
     public TimeEntry updateTimeEntry(TimeEntry timeEntry) {
-        Client client = prepareClient();
         String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, timeEntry.getId().toString());
-        WebResource webResource = client.resource(url);
 
         JSONObject object = createTimeEntryRequestParameter(timeEntry);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+        String response = getClient().body(object.toJSONString()).put(url).body().asString();
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -288,11 +256,9 @@ public class JToggl {
      * @param id 
      */
     public void destroyTimeEntry(Long id) {
-        Client client = prepareClient();
         String url = TIME_ENTRY_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebResource webResource = client.resource(url);
 
-        webResource.delete(String.class);
+        getClient().delete(url);
     }
 
 	/**
@@ -301,10 +267,8 @@ public class JToggl {
 	 * @param id
 	 */
 	public void destroyProject(Long id) {
-		Client client = prepareClient();
         String url = PROJECT_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebResource webResource = client.resource(url);
-        webResource.delete(String.class);
+        getClient().delete(url);
 	}
 
     
@@ -314,10 +278,7 @@ public class JToggl {
      * @return list of {@link Workspace}
      */
     public List<Workspace> getWorkspaces() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(WORKSPACES);
-
-        String response = webResource.get(String.class);
+        String response = fetch(WORKSPACES);
         JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<Workspace> workspaces = new ArrayList<Workspace>();
@@ -336,10 +297,7 @@ public class JToggl {
      * @return list of {@link ch.simas.jtoggl.Client}
      */
     public List<ch.simas.jtoggl.Client> getClients() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(CLIENTS);
-
-        String response = webResource.get(String.class);
+        String response = fetch(CLIENTS);
         JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
@@ -359,12 +317,10 @@ public class JToggl {
      * @return created {@link ch.simas.jtoggl.Client}
      */
     public ch.simas.jtoggl.Client createClient(ch.simas.jtoggl.Client clientObject) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(CLIENTS);
 
         JSONObject object = createClientRequestParameter(clientObject);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String url = CLIENTS;
+        String response = post(object, url);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -378,13 +334,10 @@ public class JToggl {
      * @return updated {@link ch.simas.jtoggl.Client}
      */
     public ch.simas.jtoggl.Client updateClient(ch.simas.jtoggl.Client clientObject) {
-        Client client = prepareClient();
         String url = CLIENT_BY_ID.replace(PLACEHOLDER, clientObject.getId().toString());
-        WebResource webResource = client.resource(url);
 
         JSONObject object = createClientRequestParameter(clientObject);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+        String response = getClient().body(object.toJSONString()).put(url).body().asString();
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -397,11 +350,8 @@ public class JToggl {
      * @param id 
      */
     public void destroyClient(Long id) {
-        Client client = prepareClient();
         String url = CLIENT_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebResource webResource = client.resource(url);
-
-        webResource.delete(String.class);
+        getClient().delete(url);
     }
 
     /**
@@ -430,12 +380,8 @@ public class JToggl {
      * @return created {@link Project}
      */
     public Project createProject(Project project) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(PROJECTS);
-
         JSONObject object = createProjectRequestParameter(project);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String response = post(object, PROJECTS);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -449,13 +395,9 @@ public class JToggl {
      * @return updated {@link Project}
      */
     public Project updateProject(Project project) {
-        Client client = prepareClient();
         String url = PROJECT_BY_ID.replace(PLACEHOLDER, project.getId().toString());
-        WebResource webResource = client.resource(url);
-
         JSONObject object = createProjectRequestParameter(project);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+        String response = getClient().body(object.toJSONString()).put(url).body().asString();
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -469,12 +411,9 @@ public class JToggl {
      * @return created {@link ProjectUser}
      */
     public ProjectUser createProjectUser(ProjectUser projectUser) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(PROJECT_USERS);
-
         JSONObject object = createProjectUserRequestParameter(projectUser);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String response = post(object, PROJECT_USERS);
+
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -506,12 +445,8 @@ public class JToggl {
      * @return created {@link Task}
      */
     public Task createTask(Task task) {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(TASKS);
-
         JSONObject object = createTaskRequestParameter(task);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).post(String.class);
+        String response = post(object, TASKS);
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -525,13 +460,10 @@ public class JToggl {
      * @return updated {@link Task}
      */
     public Task updateTask(Task task) {
-        Client client = prepareClient();
         String url = TASK_BY_ID.replace(PLACEHOLDER, task.getId().toString());
-        WebResource webResource = client.resource(url);
-
         JSONObject object = createTaskRequestParameter(task);
-        String response = webResource.entity(
-                object.toJSONString(), MediaType.APPLICATION_JSON_TYPE).put(String.class);
+
+        String response = getClient().body(object.toJSONString()).put(url).body().asString();
 
         object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
@@ -544,11 +476,8 @@ public class JToggl {
      * @param id
      */
     public void destroyTask(Long id) {
-        Client client = prepareClient();
         String url = TASK_BY_ID.replace(PLACEHOLDER, id.toString());
-        WebResource webResource = client.resource(url);
-
-        webResource.delete(String.class);
+        getClient().delete(url);
     }
 
     /**
@@ -557,10 +486,7 @@ public class JToggl {
      * @return current user {@link User}
      */
     public User getCurrentUser() {
-        Client client = prepareClient();
-        WebResource webResource = client.resource(GET_CURRENT_USER);
-
-        String response = webResource.get(String.class);
+        String response = fetch(GET_CURRENT_USER);
         JSONObject object = (JSONObject) JSONValue.parse(response);
         JSONObject data = (JSONObject) object.get(DATA);
 
@@ -586,11 +512,9 @@ public class JToggl {
 	 * @return all users
 	 */
 	public List<User> getWorkspaceUsers(long workspaceId) {
-		Client client = prepareClient();
 		String url = WORKSPACE_USERS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-		WebResource webResource = client.resource(url);
 
-		String response = webResource.get(String.class);
+		String response = fetch(url);
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
 		List<User> users = new ArrayList<User>();
@@ -611,11 +535,9 @@ public class JToggl {
 	 * @return all projects
 	 */
 	public List<Project> getWorkspaceProjects(long workspaceId) {
-		Client client = prepareClient();
 		String url = WORKSPACE_PROJECTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-		WebResource webResource = client.resource(url);
 
-		String response = webResource.get(String.class);
+		String response = fetch(url);
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
 		List<Project> projects = new ArrayList<Project>();
@@ -636,11 +558,8 @@ public class JToggl {
 	 * @return all clients
 	 */
 	public List<ch.simas.jtoggl.Client> getWorkspaceClients(long workspaceId) {
-		Client client = prepareClient();
 		String url = WORKSPACE_CLIENTS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-		WebResource webResource = client.resource(url);
-
-		String response = webResource.get(String.class);
+		String response = fetch(url);
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
         List<ch.simas.jtoggl.Client> clients = new ArrayList<ch.simas.jtoggl.Client>();
@@ -661,11 +580,8 @@ public class JToggl {
 	 * @return all tasks
 	 */
 	public List<Task> getActiveWorkspaceTasks(long workspaceId) {
-		Client client = prepareClient();
 		String url = WORKSPACE_TASKS.replace(PLACEHOLDER, String.valueOf(workspaceId));
-		WebResource webResource = client.resource(url);
-
-		String response = webResource.get(String.class);
+		String response = fetch(url);
 		JSONArray data = (JSONArray) JSONValue.parse(response);
 
 		List<Task> tasks = new ArrayList<Task>();
@@ -678,7 +594,7 @@ public class JToggl {
 		return tasks;
 	}
 
-	/**
+    /**
 	 * All users in all workspaces.
 	 * 
 	 * @return all users in all workspaces
@@ -707,21 +623,65 @@ public class JToggl {
         this.log = false;
     }
 
-    private Client prepareClient() {
-		DefaultClientConfig clientConfig = new DefaultClientConfig();
-		clientConfig.getProperties().put(ClientConfig.PROPERTY_CONNECT_TIMEOUT, 30 * 1000);
-		clientConfig.getProperties().put(ClientConfig.PROPERTY_READ_TIMEOUT, 30 * 1000);
-		Client client = Client.create(clientConfig);
-        client.addFilter(new HTTPBasicAuthFilter(user, password));
+    private String fetch(String url) {
+        return fetch(url, new HashMap<String, String>());
+    }
+
+    private String post(JSONObject object, String url) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+
+        }
+
+        RequestSpecification client = getClient();
+        Response response = client
+                .body(object.toJSONString())
+                .post(url);
+        if (response.getStatusCode() == 403) {
+            throw new RuntimeException("forbidden");
+        } else if (response.getStatusCode() == 404) {
+            throw new RuntimeException("not found: " + url);
+        } else if (response.getStatusCode() == 400) {
+            throw new RuntimeException("bad request: " + response.getBody().asString());
+        }
+        return response.body().asString();
+    }
+
+    private String fetch(String url, Map<String, String> params) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+
+        }
+
+        RequestSpecification client = getClient();
+        Response response = client
+                .params(params)
+                .get(url);
+        if (response.getStatusCode() == 403) {
+            throw new RuntimeException("forbidden");
+        } else if (response.getStatusCode() == 404) {
+            throw new RuntimeException("not found: " + url);
+        } else if (response.getStatusCode() == 400) {
+            throw new RuntimeException("bad request: " + response.getBody().asString());
+        }
+        return response.body().asString();
+    }
+
+    private RequestSpecification getClient() {
+        RestAssuredConfig config = RestAssured.config()
+                .httpClient(HttpClientConfig.httpClientConfig()
+                        .setParam(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000)
+                        .setParam(CoreConnectionPNames.SO_TIMEOUT, 1000));
+
+        RequestSpecification result = RestAssured.given().config(config);
         if (log) {
-            LoggingFilter loggingFilter = new LoggingFilter();
-			client.addFilter(loggingFilter);
+            result = result
+                    .filter(new RequestLoggingFilter())
+                    .filter(new ResponseLoggingFilter());
         }
-        if (throttlePeriod > 0L)
-        {
-        	client.addFilter(new DelayFilter(throttlePeriod));
-        }
-        return client;
+        return result.auth().preemptive().basic(user, password).contentType(ContentType.JSON);
     }
 
 

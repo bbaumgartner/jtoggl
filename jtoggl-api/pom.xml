@@ -4,7 +4,7 @@
 
     <groupId>ch.simas.jtoggl</groupId>
     <artifactId>jtoggl-api</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>jtoggl-api</name>
@@ -12,27 +12,32 @@
     
     <developers>
         <developer>
-            <name>Simon Martinelli</name>
-            <organization>simas GmbH</organization>
-            <email>sm@simas.ch</email>
+            <name>Benno Baumgartner</name>
+            <organization>Comerge AG</organization>
+            <email>support@comerge.net</email>
         </developer>
     </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>1.18.1</version>
-        </dependency>    
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
-        </dependency>    
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -45,26 +50,29 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
             </plugin>
+        <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.8</version>
+            <extensions>true</extensions>
+            <configuration>
+                <serverId>comerge-public-maven</serverId>
+                <nexusUrl>https://nexus.comerge.net/repository/comerge-public-maven/</nexusUrl>
+            </configuration>
+        </plugin>
          </plugins>
     </build>
-            
-    <scm>
-        <developerConnection>scm:svn:https://jtoggl.googlecode.com/svn/trunk/jtoggl-api</developerConnection>
-    </scm>
+
 
 	<distributionManagement>
  		<repository>
-		   <id>public_releases</id>
-		   <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_releases</url>
+		   <id>comerge-public-maven</id>
+		   <url>https://nexus.comerge.net/repository/comerge-public-maven/</url>
 		</repository>
 		<snapshotRepository>
-		    <id>public_snapshots</id>
-		    <url>http://pandora.comerge.net:8081/nexus/content/repositories/public_snapshots</url>
+		    <id>comerge-public-maven</id>
+		    <url>https://nexus.comerge.net/repository/comerge-public-maven/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
