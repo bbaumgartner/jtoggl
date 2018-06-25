@@ -27,9 +27,10 @@ import java.util.Optional;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
-import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -131,8 +132,10 @@ public class JTogglTest {
 
     @Test
     public void startStopTimeEntry() throws Exception {
-        TimeEntry current = jToggl.getCurrentTimeEntry();
-        Assert.assertNull(current);
+        TimeEntry running = jToggl.getCurrentTimeEntry();
+        if (running != null) {
+            jToggl.stopTimeEntry(running);
+        }
 
         TimeEntry timeEntry = new TimeEntry();
         timeEntry.setWorkspace(workspace);
@@ -146,7 +149,7 @@ public class JTogglTest {
             Assert.assertNotNull(te.getId());//created
             Assert.assertTrue(te.getDuration() < 0);//running
 
-            current = jToggl.getCurrentTimeEntry();
+            TimeEntry current = jToggl.getCurrentTimeEntry();
             Assert.assertNotNull(current);
             Assert.assertEquals(current.getId(), te.getId());
 
@@ -161,6 +164,11 @@ public class JTogglTest {
             Assert.assertNull(current);
         } finally {
             jToggl.destroyTimeEntry(te.getId());
+
+            if (running != null) {
+                running.setCreated_with("JToggl Unit Test");
+                jToggl.startTimeEntry(running);
+            }
         }
     }
 
