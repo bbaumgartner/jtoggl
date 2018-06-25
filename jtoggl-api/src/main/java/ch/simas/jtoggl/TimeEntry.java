@@ -22,11 +22,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ch.simas.jtoggl.util.DateUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-
-import ch.simas.jtoggl.util.DateUtil;
 
 /**
  * 
@@ -48,6 +47,7 @@ public class TimeEntry {
 	private Long pid;
 	private Long wid;
 	private Long tid;
+    private Long uid;
 
     public TimeEntry() {
     }
@@ -73,7 +73,7 @@ public class TimeEntry {
 		this.pid = (Long) object.get("pid");
 		this.wid = (Long) object.get("wid");
 		this.tid = (Long) object.get("tid");
-
+        this.uid = (Long) object.get("uid");
 
         JSONObject workspaceObject = (JSONObject) object.get("workspace");
         if (workspaceObject != null) {
@@ -213,6 +213,15 @@ public class TimeEntry {
 	public void setTid(Long tid) {
 		this.tid = tid;
 	}
+
+    public Long getUid() {
+        return uid;
+    }
+
+    public TimeEntry setUid(Long uid) {
+        this.uid = uid;
+        return this;
+    }
 
     public JSONObject toJSONObject() {
         JSONObject object = new JSONObject();
