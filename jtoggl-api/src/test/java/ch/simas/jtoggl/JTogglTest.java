@@ -18,9 +18,13 @@
  */
 package ch.simas.jtoggl;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import static org.junit.Assert.assertTrue;
@@ -58,8 +62,8 @@ public class JTogglTest {
         workspace = workspaces.get(0);
 
         client = createClient();
-        timeEntry = createTimeEntry();
         project = createProject();
+        timeEntry = createTimeEntry(project);
         task = createTask();
     }
 
@@ -113,7 +117,9 @@ public class JTogglTest {
     }
 
     @Test
-    public void updateTimeEntry() {
+    public void updateTimeEntry() throws Exception {
+        TimeEntry timeEntry = createTimeEntry(project);
+
         final String DESCRIPTION = "ABC";
 
         timeEntry.setDescription(DESCRIPTION);
@@ -244,9 +250,25 @@ public class JTogglTest {
         Assert.assertTrue(!users.isEmpty());
     }
 
-    private static TimeEntry createTimeEntry() throws Exception {
+    @Test
+    public void getDetailedReport() {
+        PagedResult detailedReport = jToggl.getDetailedReport((PagedReportsParameter) new PagedReportsParameter(workspace.getId(), "jtoggl-integration-test")
+                .setSince("2011-11-15")
+                .setUntil("2011-11-15")
+                .setProjectIds(Collections.singleton(project.getId())));
+
+        Optional<TimeEntry> entry = detailedReport.getEntries().stream().filter(e -> e.getDescription().equals("From JUnit Test")).findFirst();
+        Assert.assertTrue(entry.isPresent());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Assert.assertEquals(formatter.format(timeEntry.getStart()), formatter.format(entry.get().getStart()));
+        Assert.assertEquals(formatter.format(timeEntry.getStop()), formatter.format(entry.get().getStop()));
+        Assert.assertEquals(timeEntry.getId(), entry.get().getId());
+    }
+
+    private static TimeEntry createTimeEntry(Project project) throws Exception {
         TimeEntry entry = new TimeEntry();
-        entry.setDuration(480);
+        entry.setDuration(480L);
         entry.setBillable(true);
         Calendar cal = Calendar.getInstance();
         cal.set(2011, 10, 15, 8, 0);
@@ -255,6 +277,7 @@ public class JTogglTest {
         entry.setStop(cal.getTime());
         entry.setDescription("From JUnit Test");
         entry.setCreated_with("JUnit");
+        entry.setPid(project.getId());
 
         entry = jToggl.createTimeEntry(entry);
         Assert.assertNotNull(entry);
@@ -264,7 +287,7 @@ public class JTogglTest {
 
     private static Client createClient() {
         Client cl = new Client();
-        cl.setName("JUnit Client 2");
+        cl.setName("JToggl Test Client");
         cl.setWorkspace(workspace);
 
         cl = jToggl.createClient(cl);

@@ -19,13 +19,17 @@
 package ch.simas.jtoggl;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import io.restassured.filter.log.LogDetail;
 import org.apache.http.params.CoreConnectionPNames;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -49,38 +53,39 @@ import io.restassured.specification.RequestSpecification;
  */
 public class JToggl {
 
-	public static final String API_ROOT = "https://www.toggl.com/api";
-	public static final int API_VERSION = 8;
-	public static final String API_BASE = String.format("%s/v%d/", API_ROOT, API_VERSION);
-	
-    public static final String DATA = "data";
-    public static final String PLACEHOLDER = "{0}";
-    public static final String SIMPLE_ID_PATH = "/" + PLACEHOLDER;
-    
+    private static final String API_ROOT = "https://www.toggl.com/api";
+    private static final String REPORTS_ENDPOINT = "https://toggl.com/reports/api/v2";
+    private static final int API_VERSION = 8;
+    private static final String API_BASE = String.format("%s/v%d/", API_ROOT, API_VERSION);
+
+    private static final String DATA = "data";
+    private static final String PLACEHOLDER = "{0}";
+    private static final String SIMPLE_ID_PATH = "/" + PLACEHOLDER;
+
     private final static String TIME_ENTRIES = API_BASE + "time_entries";
     private final static String TIME_ENTRY_BY_ID = TIME_ENTRIES + SIMPLE_ID_PATH;
-	private final static String TIME_ENTRY_CURRENT = TIME_ENTRIES + "/current";
-	private final static String TIME_ENTRY_START = TIME_ENTRIES + "/start";
-	private final static String TIME_ENTRY_STOP = TIME_ENTRIES + SIMPLE_ID_PATH + "/stop";
-	
+    private final static String TIME_ENTRY_CURRENT = TIME_ENTRIES + "/current";
+    private final static String TIME_ENTRY_START = TIME_ENTRIES + "/start";
+    private final static String TIME_ENTRY_STOP = TIME_ENTRIES + SIMPLE_ID_PATH + "/stop";
+
     private final static String WORKSPACES = API_BASE + "workspaces";
     private final static String WORKSPACE_BY_ID = WORKSPACES + SIMPLE_ID_PATH;
-	private final static String WORKSPACE_USERS = WORKSPACE_BY_ID + "/users";
-	private final static String WORKSPACE_PROJECTS = WORKSPACE_BY_ID + "/projects";
-	private final static String WORKSPACE_TASKS = WORKSPACE_BY_ID + "/tasks";
-	private final static String WORKSPACE_CLIENTS = WORKSPACE_BY_ID + "/clients";
-	
+    private final static String WORKSPACE_USERS = WORKSPACE_BY_ID + "/users";
+    private final static String WORKSPACE_PROJECTS = WORKSPACE_BY_ID + "/projects";
+    private final static String WORKSPACE_TASKS = WORKSPACE_BY_ID + "/tasks";
+    private final static String WORKSPACE_CLIENTS = WORKSPACE_BY_ID + "/clients";
+
     private final static String CLIENTS = API_BASE + "clients";
     private final static String CLIENT_BY_ID = CLIENTS + SIMPLE_ID_PATH;
-    
+
     private final static String PROJECTS = API_BASE + "projects";
     private final static String PROJECT_BY_ID = PROJECTS + SIMPLE_ID_PATH;
-    
+
     private final static String TASKS = API_BASE + "tasks";
     private final static String TASK_BY_ID = TASKS + SIMPLE_ID_PATH;
-    
+
     private final static String TAGS = API_BASE + "tags";
-    
+
     private final static String PROJECT_USERS = WORKSPACES + "/673279/project_users";
     private final static String GET_CURRENT_USER = API_BASE + "me";
     private final String user;
@@ -608,6 +613,11 @@ public class JToggl {
 		}
 		return new ArrayList<User>(result);
 	}
+
+    public PagedResult getDetailedReport(PagedReportsParameter parameters) {
+        String response = fetch(REPORTS_ENDPOINT + "/details?" + parameters.toParamList());
+        return new PagedResult(response);
+    }
 	
     /**
      * Switch logging on.

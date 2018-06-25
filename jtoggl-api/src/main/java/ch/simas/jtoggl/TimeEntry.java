@@ -39,7 +39,7 @@ public class TimeEntry {
     private Project project;
     private Date start;
     private Date stop;
-    private long duration;
+    private Long duration;
     private Boolean billable;
     private Workspace workspace;
     private List<String> tag_names = new ArrayList<String>();
@@ -57,9 +57,17 @@ public class TimeEntry {
         this.id = (Long) object.get("id");
         this.description = (String) object.get("description");
         this.start = DateUtil.convertStringToDate((String) object.get("start"));
-        this.stop = DateUtil.convertStringToDate((String) object.get("stop"));
+        if (object.containsKey("end")) {
+            this.stop = DateUtil.convertStringToDate((String) object.get("end"));
+        } else {
+            this.stop = DateUtil.convertStringToDate((String) object.get("stop"));
+        }
         this.duration = (Long) object.get("duration");
-        this.billable = (Boolean) object.get("billable");
+        if (object.containsKey("is_billable")) {
+            this.billable = (Boolean) object.get("is_billable");
+        } else {
+            this.billable = (Boolean) object.get("billable");
+        }
         this.duronly = (Boolean) object.get("duronly");
         created_with = (String) object.get("created_with");
 		this.pid = (Long) object.get("pid");
@@ -72,9 +80,14 @@ public class TimeEntry {
             this.workspace = new Workspace(workspaceObject.toJSONString());
         }
 
-        JSONObject projectObject = (JSONObject) object.get("project");
-        if (projectObject != null) {
+        Object project = object.get("project");
+        if (project instanceof JSONObject) {
+            JSONObject projectObject = (JSONObject) project;
             this.project = new Project(projectObject.toJSONString());
+        } else if (project instanceof String) {
+            this.project = new Project();
+            this.project.setName((String) project);
+            this.project.setId(this.pid);
         }
         // Tag names
         JSONArray tagsArray = (JSONArray) object.get("tags");
@@ -103,11 +116,11 @@ public class TimeEntry {
         this.description = description;
     }
 
-    public long getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
-    public void setDuration(long duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 
@@ -209,7 +222,7 @@ public class TimeEntry {
         if (description != null) {
             object.put("description", description);
         }
-        if (duration != 0) {
+        if (duration != null) {
             object.put("duration", duration);
         }
         if (id != null) {
