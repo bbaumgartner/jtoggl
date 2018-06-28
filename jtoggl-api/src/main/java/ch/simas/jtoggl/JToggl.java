@@ -18,22 +18,12 @@
  */
 package ch.simas.jtoggl;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import io.restassured.filter.log.LogDetail;
-import org.apache.http.params.CoreConnectionPNames;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import ch.simas.jtoggl.util.DateUtil;
 import io.restassured.RestAssured;
@@ -44,6 +34,10 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.http.params.CoreConnectionPNames;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 
 /**
@@ -682,8 +676,8 @@ public class JToggl {
     private RequestSpecification getClient() {
         RestAssuredConfig config = RestAssured.config()
                 .httpClient(HttpClientConfig.httpClientConfig()
-                        .setParam(CoreConnectionPNames.CONNECTION_TIMEOUT, 1000)
-                        .setParam(CoreConnectionPNames.SO_TIMEOUT, 1000));
+                        .setParam(CoreConnectionPNames.CONNECTION_TIMEOUT, 15 * 1000)
+                        .setParam(CoreConnectionPNames.SO_TIMEOUT, 15 * 1000));
 
         RequestSpecification result = RestAssured.given().config(config);
         if (log) {
