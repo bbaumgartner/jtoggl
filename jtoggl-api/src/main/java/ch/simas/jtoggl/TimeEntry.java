@@ -62,7 +62,11 @@ public class TimeEntry {
         } else {
             this.stop = DateUtil.convertStringToDate((String) object.get("stop"));
         }
-        this.duration = (Long) object.get("duration");
+        if (object.containsKey("dur")) {
+            this.duration = (Long) object.get("dur");
+        } else {
+            this.duration = (Long) object.get("duration");
+        }
         if (object.containsKey("is_billable")) {
             this.billable = (Boolean) object.get("is_billable");
         } else {
